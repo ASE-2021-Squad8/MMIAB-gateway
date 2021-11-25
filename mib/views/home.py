@@ -9,3 +9,14 @@ def index():
     """
     return render_template("index.html")
 
+
+def get_settings():  # noqa: E501
+    """Render settings page
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+

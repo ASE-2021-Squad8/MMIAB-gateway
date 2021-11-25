@@ -74,3 +74,189 @@ def delete_user(id):
         
     return redirect(url_for('home.index'))
 
+
+def change_pass_user_page():  # noqa: E501
+    """Render change password template
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def change_pass_user(body=None):  # noqa: E501
+    """Change password for current user
+
+     # noqa: E501
+
+    :param body: 
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = UserPasswordBody.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
+
+
+def content_filter_page():  # noqa: E501
+    """Render content filter page
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def set_content_filter(body=None):  # noqa: E501
+    """Change the content filter state
+
+     # noqa: E501
+
+    :param body: 
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = UserContentFilterBody.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
+
+
+def create_user_page():  # noqa: E501
+    """Render sign up template
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def get_black_list():  # noqa: E501
+    """Render blacklist template
+
+    Return the user's black list page # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def update_black_list(body):  # noqa: E501
+    """Update the black list for a user
+
+    Update user black list adding or removing an user # noqa: E501
+
+    :param body: 
+    :type body: dict | bytes
+
+    :rtype: InlineResponse200
+    """
+    if connexion.request.is_json:
+        body = UserBlacklistBody.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
+
+
+def report_page():  # noqa: E501
+    """Render report page
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def report(body=None):  # noqa: E501
+    """Report a user
+
+     # noqa: E501
+
+    :param body: 
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = UserReportBody.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
+
+
+def search_user():  # noqa: E501
+    """Render the search user page
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def unregister():  # noqa: E501
+    """Unregister the current_user
+
+    Delete a user by its id # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def user_profile():  # noqa: E501
+    """Render profile template of current user
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def users_list_json():  # noqa: E501
+    """Return users list
+
+     # noqa: E501
+
+
+    :rtype: List[InlineResponse2001]
+    """
+    return 'do some magic!'
+
+
+def update_user(body):  # noqa: E501
+    """Updates the fields for the current user
+
+     # noqa: E501
+
+    :param body: 
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = UserBody.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
+
+
+def users_list():  # noqa: E501
+    """Render users list template
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+

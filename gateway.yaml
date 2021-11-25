@@ -158,14 +158,6 @@ paths:
       tags: [ User]
       description: Return the user's black list page
       operationId: handle_black_list_get
-      parameters:
-        - name: user_id
-          description: User Unique ID
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
       responses:
         200:
           description: Black list retrieved, it returns the black list page
@@ -174,14 +166,6 @@ paths:
       tags: [User]
       description: Update user black list adding or removing an user
       operationId: handle_black_list_post
-      parameters:
-        - name: user_id
-          description: User Unique ID
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
       requestBody:
         required: true
         content:
@@ -563,13 +547,6 @@ paths:
       summary: Gets all messages sent in a time interval (includes yet to be delivered)
       operationId: mib.resources.message.between_dates
       parameters:
-        - name: user_id
-          description: User Unique ID
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
         - name: day
           description: day
           in: path
@@ -688,6 +665,7 @@ paths:
   /settings:
     get:
       summary: Render settings page
+      tags: [Home]
       operationId: get_settings
       responses:
         200:
@@ -766,37 +744,3 @@ components:
           type: boolean
           description: true if the message has an attachment
           example: true
-                  
-                  
-      
-    
-  
-  
-        
-    
-    
-        
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-      
