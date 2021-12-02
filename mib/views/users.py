@@ -32,7 +32,6 @@ def create_user():
             lastname,
             date
         )
-
         if response.status_code == 201:
             # in this case the request is ok!
             user = response.json()

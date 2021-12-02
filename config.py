@@ -24,7 +24,7 @@ class Config(object):
     USERS_MS_PROTO = os.getenv('USERS_MS_PROTO', 'http')
     USERS_MS_HOST = os.getenv('USERS_MS_HOST', 'localhost')
     USERS_MS_PORT = os.getenv('USERS_MS_PORT', 5001)
-    USERS_MS_URL = '%s://%s:%s' % (USERS_MS_PROTO, USERS_MS_HOST, USERS_MS_PORT)
+    USERS_MS_URL = '%s://%s:%s/api' % (USERS_MS_PROTO, USERS_MS_HOST, USERS_MS_PORT)
 
     # restaurants
     RESTAURANTS_MS_PROTO = os.getenv('RESTAURANTS_MS_PROTO', 'http')

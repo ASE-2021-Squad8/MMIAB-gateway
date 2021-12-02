@@ -11,7 +11,7 @@ def index():
     return render_template("index.html", form=form)
 
 
-@home.route('/settings',methods=['GET'])
+@home.route('/settings', methods=['GET'])
 def get_settings():  # noqa: E501
     """Render settings page
      # noqa: E501

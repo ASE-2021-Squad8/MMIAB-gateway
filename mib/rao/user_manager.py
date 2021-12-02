@@ -18,12 +18,11 @@ class UserManager:
         :return: User obj with id=user_id
         """
         try:
-            response = requests.get("%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id)),
-                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            response = requests.get(cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/public", timeout=cls.REQUESTS_TIMEOUT_SECONDS)                        
             json_payload = response.json()
             if response.status_code == 200:
-                # user is authenticated
-                user = User.build_from_json(json_payload)
+                #user is authenticated
+                user = response
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
 
@@ -41,7 +40,7 @@ class UserManager:
         :return: User obj with email=user_email
         """
         try:
-            response = requests.get("%s/user_email/%s" % (cls.USERS_ENDPOINT, user_email),
+            response = requests.get(cls.USERS_ENDPOINT + 
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
             user = None
