@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-
+from mib.forms.forms import MessageForm
 home = Blueprint('home', __name__)
 
 
@@ -7,16 +7,15 @@ home = Blueprint('home', __name__)
 def index():
     """General route for the index page
     """
-    return render_template("index.html")
+    form = MessageForm()
+    return render_template("index.html", form=form)
 
 
+@home.route('/settings',methods=['GET'])
 def get_settings():  # noqa: E501
     """Render settings page
-
      # noqa: E501
-
-
     :rtype: None
     """
-    return 'do some magic!'
+    return render_template("settings.html")
 

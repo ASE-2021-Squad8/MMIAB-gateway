@@ -1,3 +1,11 @@
+from flask import Blueprint, redirect, render_template, url_for, flash, request
+from flask_login import (login_user, login_required)
+from mib.forms.forms import MessageForm
+
+msg = Blueprint("message", __name__)
+
+
+
 def attachment_get(message_id):  # noqa: E501
     """Retrieves an attachment of a message
 
@@ -45,16 +53,13 @@ def get_all_sent_messages_metadata():  # noqa: E501
     """
     return 'do some magic!'
 
-
+@msg.route('/calendar',methods=['GET'])
 def get_calendar():  # noqa: E501
     """Render user's calendar
-
      # noqa: E501
-
-
     :rtype: None
     """
-    return 'do some magic!'
+    return render_template("calendar.html")
 
 
 def get_message(message_id):  # noqa: E501
@@ -69,27 +74,24 @@ def get_message(message_id):  # noqa: E501
     """
     return 'do some magic!'
 
-
+@msg.route('/mailbox',methods=['GET'])
 def mailbox():  # noqa: E501
     """Render mailboxpage
-
      # noqa: E501
-
-
     :rtype: None
     """
-    return 'do some magic!'
+    return render_template("mailbox.html")
 
-
+@msg.route('/message', methods=["GET"])
 def send_message_page():  # noqa: E501
     """Render message page
-
      # noqa: E501
-
-
     :rtype: None
     """
-    return 'do some magic!'
+
+    message=None
+
+    return render_template("send_message.html", message=message, form=MessageForm())
 
 
 def send_message(body):  # noqa: E501

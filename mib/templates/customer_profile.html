@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Account data{% endblock %}
+
+{% block content %}
+<h1>Account data</h1>
+<a href="/" class="btn btn-outline-primary">Homepage</a>
+<a href="{{url_for('home.settings')}}" class="btn btn-outline-primary">Back to settings</a><br>
+
+<div>
+	<br>
+	<h1>{{user.firstname}} {{user.lastname}}</h1>
+	<dl>
+		<dd>User mail: <b>{{ user.email }}</b></dd>
+		<dd>Date of birth: <b>{{ date }}</b></dd>
+	</dl>
+	<a href="{{url_for('users.change_data_user')}}" class="btn btn-success" tabindex="-1" role="button"
+		aria-disabled="true">Edit profile</a>
+	<a href="{{url_for('users.change_pass_user')}}" class="btn btn-warning" tabindex="-1" role="button"
+		aria-disabled="true">Change
+		password</a>
+</div><br>
+{% endblock %}

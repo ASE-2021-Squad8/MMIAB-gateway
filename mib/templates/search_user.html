@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Search user{% endblock %}
+
+{% block content %}
+<h1>Search for a user</h1>
+<a href="/" class="btn btn-outline-primary">Homepage</a><br><br>
+
+<br><label>Search <input id="search" type="text" placeholder="Type to search"></label><br><br>
+<table class="table table-light" id="users">
+	<thead>
+		<tr>
+			<th scope="col">E-mail</th>
+			<th scope="col">First name</th>
+			<th scope="col">Last name</th>
+		</tr>
+	</thead>
+</table>
+{% endblock %}
+{% block scripts %}
+<script>
+	$.get("{{url_for('users.get_users_list_json')}}", function (data) { buildTable(data); });
+
+	function buildTable(data) {
+		console.log(data);
+		var table = document.getElementById('users');
+		for (var i = 0; i < data.length; i++) {
+			user = data[i];
+			var row = `<tr>
+					<td>${user.email}</td>
+					<td>${user.firstname}</td>
+					<td>${user.lastname}</td>
+			  </tr>`;
+			table.innerHTML += row;
+
+		}
+		search();
+	}
+
+	//Inspired by https://stackoverflow.com/a/9127872/12346032
+	function search() {
+		var $rows = $('#users tbody tr');
+		$('#search').keyup(function () {
+
+			var val = '^(?=.*\\b' + $.trim($(this).val()).split(/\s+/).join('\\b)(?=.*\\b') + ').*$',
+				reg = RegExp(val, 'i'),
+				text;
+
+			$rows.show().filter(function () {
+				text = $(this).text().replace(/\s+/g, ' ');
+				return !reg.test(text);
+			}).hide();
+		});
+	}
+</script>
+{% endblock %}

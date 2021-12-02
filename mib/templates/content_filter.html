@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Content filter{% endblock %}
+
+{% block content %}
+<h1>Content filter</h1>
+
+<a href="/" class="btn btn-outline-primary">Homepage</a>
+<a href="{{url_for('home.settings')}}" class="btn btn-outline-primary">Back to settings</a><br><br>
+
+Press enable to activate a content filter that automatically censors bad words!<br><br>
+
+<form method="POST">
+	<input type="radio" id="enable_choice" name="filter" value="1">
+	<label for="enable_choice">Enable</label>
+	<input type="radio" id="disable_choice" name="filter" value="0">
+	<label for="disable_choice">Disable</label><br>
+	<button type="submit" formaction="{{url_for('users.set_content_filter')}}" class="btn btn-primary">Save</button><br><br>
+</form>
+
+{{feedback}}
+{% endblock %}

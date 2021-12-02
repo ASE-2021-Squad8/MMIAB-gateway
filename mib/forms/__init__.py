@@ -1,4 +1,2 @@
-from .login import LoginForm
-from .user import UserForm
-
-all_forms = [LoginForm, UserForm]
+from .forms import LoginForm,UserForm,MessageForm,ChangePassForm,BlackListForm
+all_forms = [LoginForm, UserForm,MessageForm,ChangePassForm,BlackListForm]

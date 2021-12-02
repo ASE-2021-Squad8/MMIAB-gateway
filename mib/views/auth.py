@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import login_required, login_user, logout_user
-from mib.forms import LoginForm
+from mib.forms.forms import LoginForm
 from mib.rao.user_manager import UserManager
 
 auth = Blueprint('auth', __name__)

@@ -1,3 +1,4 @@
+
 def delete_draft(draft_id):  # noqa: E501
     """Delete a draft by id
 
