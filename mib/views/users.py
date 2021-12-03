@@ -1,13 +1,16 @@
 import datetime
+import json
 
-from flask import Blueprint, redirect, render_template, url_for, request
+from flask import Blueprint, redirect, render_template, url_for, request, abort
 from flask_login import login_user, login_required, current_user
 
 from mib.forms import UserForm
 from mib.forms.forms import BlackListForm, ChangePassForm
 from mib.rao.user_manager import UserManager
 from mib.auth.user import User
-from flask import abort
+from mib.views.auth import check_authenticated
+
+
 users = Blueprint("users", __name__)
 
 
@@ -30,7 +33,7 @@ def create_user():
             dateofbirth = form.data["dateofbirth"]
             date = dateofbirth.strftime("%Y-%m-%d")
             # check if date of birth is valid (in the past)
-            if dateofbirth is None or date > datetime.date.today():
+            if dateofbirth is None or dateofbirth > datetime.date.today():
                 return render_template(
                     "create_user.html",
                     form=form,
@@ -76,21 +79,31 @@ def change_pass_user():  # noqa: E501
      # noqa: E501
     :rtype: None
     """
+    check_authenticated(current_user)
+
     form = ChangePassForm()
     if request.method == "GET":
-        return render_template("reset_password.html", form = form)
+        return render_template("reset_password.html", form=form)
     elif request.method == "POST":
-        user_id = current_user.id 
+        user_id = current_user.id
         currpw = form.currentpassword.data
         newpw = form.newpassword.data
         confpw = form.confirmationpassword.data
         response = UserManager.change_password(user_id, currpw, newpw, confpw)
         if response.status_code == 200:
-            return render_template("reset_password.html", form = form, success = "Password updated!")
+            return render_template(
+                "reset_password.html", form=form, success="Password updated!"
+            )
         elif response.status_code == 401:
-            return render_template("reset_password.html", form = form, error = "Wrong current password!")
+            return render_template(
+                "reset_password.html", form=form, error="Wrong current password!"
+            )
         elif response.status_code == 422:
-            return render_template("reset_password.html", form = form, error = "Check the correctness of the confirmation password!")
+            return render_template(
+                "reset_password.html",
+                form=form,
+                error="New password and confirmation password does not match!",
+            )
         elif response.status_code == 404:
             return abort(500)
 
@@ -101,15 +114,18 @@ def content_filter():  # noqa: E501
      # noqa: E501
     :rtype: None
     """
+    check_authenticated(current_user)
     if request.method == "GET":
         return render_template("content_filter.html")
     elif request.method == "POST":
         user_id = current_user.id
-        filter = request.form["filter"]
-        response = UserManager.set_content_filter(user_id, filter)
+        filt = request.form["filter"]
+        response = UserManager.set_content_filter(user_id, filt)
         if response.status_code == 200:
-            string = "enabled" if filter == 1 else "disabled"
-            return render_template("content_filter.html", feedback = "Your content filter has been "+string)
+            string = "enabled" if filt == "1" else "disabled"
+            return render_template(
+                "content_filter.html", feedback="Your content filter has been " + string
+            )
         elif response.status_code == 404:
             return abort(500)
 
@@ -147,38 +163,61 @@ def update_black_list(body):  # noqa: E501
 
 
 @users.route("/report", methods=["GET", "POST"])
-def report_page():  # noqa: E501
-    """Render report page
+def report():  # noqa: E501
+    """Report a user
      # noqa: E501
     :rtype: None
     """
-    #if request.method == "GET":
-        
-    # TODO: gestire errori
-    return render_template("report_user.html")
+    check_authenticated(current_user)
+    if request.method == "GET":
+        return render_template("report_user.html")
+    elif request.method == "POST":
+        reported_email = request.form["useremail"]
+        if reported_email is not None and not reported_email.isspace():
+            response = UserManager.report(reported_email)
+            if response.status_code == 200:
+                return render_template(
+                    "report_user.html", reported=reported_email + " has been reported"
+                )
+            elif response.status_code == 404:
+                return render_template(
+                    "report_user.html", error=reported_email + " does not exist"
+                )
+        else:
+            return render_template(
+                "report_user.html",
+                error="You have to specify an email to report a user",
+            )
 
 
-@users.route("/search_bar")
+@users.route("/search_bar", methods=["GET"])
 def search_user():  # noqa: E501
     """Render the search user page
 
      # noqa: E501
 
-
     :rtype: None
     """
-    return render_template("search_user.html")
+    response = UserManager.get_users_list_public()
+    users = response.json()
+    return render_template("search_user.html", userslist=users)
 
 
+@users.route("/user", methods=["DELETE"])
 def unregister():  # noqa: E501
     """Unregister the current_user
-
-    Delete a user by its id # noqa: E501
-
+     # noqa: E501
 
     :rtype: None
     """
-    return "do some magic!"
+    check_authenticated(current_user)
+
+    user_id = current_user.id
+    response = UserManager.user_unregister(user_id)
+    if response == 200:
+        return redirect(url_for("home.index"))
+    elif response == 404:
+        return abort(500)
 
 
 @users.route("/user", methods=["GET"])
@@ -187,63 +226,60 @@ def user_profile():  # noqa: E501
      # noqa: E501
     :rtype: None
     """
-    if User.is_authenticated():
-        current_user = UserManager.get_user_by_id(User.id)
-        return render_template("customer_profile.html", user=current_user)
-    else:
-        return redirect(url_for("home.index", code=302))
+    check_authenticated(current_user)
+
+    user = UserManager.get_user_by_id(current_user.id)
+    data = user.dateofbirth
+    date_of_birth = data.strftime("%a, %d %B, %Y")
+    return render_template("account_data.html", user=user, date=date_of_birth)
 
 
-def users_list_json():  # noqa: E501
-    """Return users list
-
-     # noqa: E501
-
-
-    :rtype: List[InlineResponse2001]
-    """
-    return "do some magic!"
-
-
-@users.route("/user", methods=["POST"])
-def update_user(body):  # noqa: E501
-    """Updates the fields for the current user
-
-     # noqa: E501
-
-    :param body:
-    :type body: dict | bytes
+@users.route("/user/edit_profile", methods=["GET", "POST"])
+def update_user():  # noqa: E501
+    """Updates the fields for the current user # noqa: E501
 
     :rtype: None
     """
-    if User.is_authenticated():
-        form = UserForm()
-
+    check_authenticated(current_user)
+    form = UserForm()
+    if request.method == "GET":
+        user = UserManager.get_user_by_id(current_user.id)
+        return render_template("edit_profile.html", form=form, user=user)
+    elif request.method == "POST":
+        # If some fields are blank, return an error
         if (
-            request.form["Firstname"] == ""
-            or request.form["Lastname"] == ""
-            or request.form["Birthday"] == ""
-            or request.form["Password"] == ""
-            or request.form["Email"] == ""
+            request.form["textfirstname"] == ""
+            or request.form["textlastname"] == ""
+            or request.form["textbirth"] == ""
+            or request.form["textmail"] == ""
         ):
+            user = UserManager.get_user_by_id(current_user.id)
             return render_template(
-                "update_customer.html",
+                "edit_profile.html",
                 form=form,
-                user=User.__getattribute__,
-                error="All fields must be completed or the email is already associated to an account",
+                user=user,
+                error="All fields must be completed",
             )
-        json_obj = {
-            "email": request.form["Email"],
-            "firstname": request.form["Firstname"],
-            "lastname": request.form["Lastname"],
-            "dateofbirth": request.form["Birthday"],
-        }
 
-        # TODO: chiamare microservizio per modificare valori passando quel json
-    else:
-        return redirect(url_for("home.index", code=302))
-
-    return
+        response = UserManager.change_data_user(
+            id=current_user.id,
+            email=request.form["textmail"],
+            firstname=request.form["textfirstname"],
+            lastname=request.form["textlastname"],
+            dateofbirth=request.form["textbirth"],
+        )
+        if response.status_code == 200:
+            return redirect(url_for("users.user_profile"))
+        elif response.status_code == 404:
+            return abort(500)
+        elif response.status_code == 409:
+            user = UserManager.get_user_by_id(current_user.id)
+            return render_template(
+                "edit_profile.html",
+                form=form,
+                user=user,
+                error="That email already exists in the database",
+            )
 
 
 @users.route("/users", methods=["GET"])
@@ -252,7 +288,6 @@ def users_list():  # noqa: E501
      # noqa: E501
     :rtype: None
     """
-    # TODO chiamata a microservizio
-    current_user = None
-
-    return render_template("users.html", user=current_user)
+    response = UserManager.get_users_list_public()
+    users = response.json()
+    return render_template("users.html", users=users)

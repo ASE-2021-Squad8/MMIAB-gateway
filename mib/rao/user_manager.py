@@ -19,13 +19,13 @@ class UserManager:
         """
         try:
             response = requests.get(
-                cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/public",
+                cls.USERS_ENDPOINT + "/user/" + str(user_id),
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             json_payload = response.json()
             if response.status_code == 200:
                 # user is authenticated
-                user = response
+                return User.build_from_json(json_payload)
             else:
                 raise RuntimeError(
                     "Server has sent an unrecognized status code %s"
@@ -34,8 +34,6 @@ class UserManager:
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
-        return user
 
     # @classmethod
     # def get_user_by_email(cls, user_email: str):
@@ -142,29 +140,23 @@ class UserManager:
         """
         payload = dict(email=email, password=password)
         try:
-            print("trying response....")
             response = requests.post(
                 cls.USERS_ENDPOINT + "/authenticate",
                 json=payload,
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
-            print("received response....")
             json_response = response.json()
+            
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            # We can't connect to Users MS
             return abort(500)
 
-        if response.status_code == 401:
+        if response.status_code == 400:
             # user is not authenticated
             return None
         elif response.status_code == 200:
             user = User.build_from_json(json_response["user"])
+            user.authenticate()
             return user
-        else:
-            raise RuntimeError(
-                "Microservice users returned an invalid status code %s, and message %s"
-                % (response.status_code, json_response["error_message"])
-            )
        
     @classmethod
     def change_password(cls, user_id: int, currpw: str, newpw: str, confpw: str):
@@ -187,7 +179,7 @@ class UserManager:
             return abort(500)
 
     @classmethod
-    def set_content_filter(cls, id: int, filter: int):
+    def set_content_filter(cls, id: int, filter: str):
         """Call users microservice to change the content filter for a user
 
         :param id: the user id
@@ -198,6 +190,70 @@ class UserManager:
             response = requests.put(
                 cls.USERS_ENDPOINT + "/user/content_filter/" + str(id),
                 json={"filter": filter},
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def user_unregister(cls, user_id: int):
+        """Call calls the users microservice in order to unsubscribe a user
+
+        :param user_id: id associated with the user who wants to unsubscribe
+        """
+
+        try:
+            response = requests.delete(
+                cls.USERS_ENDPOINT + "/user/" + str(user_id),
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def get_users_list_public(cls):
+        try:
+            response = requests.get(
+                cls.USERS_ENDPOINT + "/user/list/public",
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def report(cls, email: str):
+        """Report the user with an email
+
+        :param email: the email of the reported user
+        """
+        try:
+            response = requests.put(
+                cls.USERS_ENDPOINT + "/user/report",
+                json={"useremail": email},
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+            
+    @classmethod
+    def change_data_user(cls, user_id, email, firstname, lastname, dateofbirth):
+        """Interacts with the microservice of the users in order to change the data of an 
+        already registered user
+
+        :param user_id: id of the user who wants to change his personal data
+        :param email: new user's email
+        :param firstname: new user's firstname
+        :param lastname: new user's lastname
+        :param dateofbirth: new date of birth of the user
+        """
+        try:
+            response = requests.put(
+                cls.USERS_ENDPOINT + "/user/data/" + str(user_id),
+                json={"textemail": email, "textfirstname": firstname, "textlastname": lastname, "textbirth": dateofbirth},
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS
             )
             return response
