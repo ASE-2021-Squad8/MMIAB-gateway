@@ -142,7 +142,7 @@ paths:
                 lastname: 
                   type: string
                   description: the lastname field for the user
-                birthdate:
+                dateofbirth:
                   type: string
                   description: the birthday field for the user
               required:
