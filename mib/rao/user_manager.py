@@ -146,7 +146,7 @@ class UserManager:
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             json_response = response.json()
-            
+
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
@@ -157,7 +157,7 @@ class UserManager:
             user = User.build_from_json(json_response["user"])
             user.authenticate()
             return user
-       
+
     @classmethod
     def change_password(cls, user_id: int, currpw: str, newpw: str, confpw: str):
         """Call users microservice to change the password for a user
@@ -169,7 +169,11 @@ class UserManager:
         try:
             response = requests.put(
                 cls.USERS_ENDPOINT + "/user/password/" + str(user_id),
-                json={"currentpassword": currpw, "newpassword": newpw, "confirmpassword": confpw},
+                json={
+                    "currentpassword": currpw,
+                    "newpassword": newpw,
+                    "confirmpassword": confpw,
+                },
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
@@ -189,7 +193,7 @@ class UserManager:
             response = requests.put(
                 cls.USERS_ENDPOINT + "/user/content_filter/" + str(id),
                 json={"filter": filter},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -205,7 +209,7 @@ class UserManager:
         try:
             response = requests.delete(
                 cls.USERS_ENDPOINT + "/user/" + str(user_id),
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -216,7 +220,7 @@ class UserManager:
         try:
             response = requests.get(
                 cls.USERS_ENDPOINT + "/user/list/public",
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -232,15 +236,15 @@ class UserManager:
             response = requests.put(
                 cls.USERS_ENDPOINT + "/user/report",
                 json={"useremail": email},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-            
+
     @classmethod
     def change_data_user(cls, user_id, email, firstname, lastname, dateofbirth):
-        """Interacts with the microservice of the users in order to change the data of an 
+        """Interacts with the microservice of the users in order to change the data of an
         already registered user
 
         :param user_id: id of the user who wants to change his personal data
@@ -252,21 +256,25 @@ class UserManager:
         try:
             response = requests.put(
                 cls.USERS_ENDPOINT + "/user/data/" + str(user_id),
-                json={"textemail": email, "textfirstname": firstname, "textlastname": lastname, "textbirth": dateofbirth},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                json={
+                    "textemail": email,
+                    "textfirstname": firstname,
+                    "textlastname": lastname,
+                    "textbirth": dateofbirth,
+                },
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-            
+
     @classmethod
     def get_blacklist(cls, user_id: int):
-        """Get blacklisted users for user_id
-        """
+        """Get blacklisted users for user_id"""
         try:
-            response = requests.get( 
-                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id), 
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            response = requests.get(
+                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -274,13 +282,12 @@ class UserManager:
 
     @classmethod
     def add_to_blacklist(cls, user_id, userlist_to_add):
-        """Add list of users to blacklist of user_id
-        """
+        """Add list of users to blacklist of user_id"""
         try:
             response = requests.put(
                 cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
                 json={"op": "add", "users": userlist_to_add},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -288,17 +295,13 @@ class UserManager:
 
     @classmethod
     def remove_from_blacklist(cls, user_id, userlist_to_remove):
-        """Remove list of users from blacklist of user_id
-        """
+        """Remove list of users from blacklist of user_id"""
         try:
             response = requests.put(
                 cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
                 json={"op": "delete", "users": userlist_to_remove},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
-
-    

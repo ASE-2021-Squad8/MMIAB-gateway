@@ -1,8 +1,6 @@
 from flask import Blueprint, render_template
-from flask_login import current_user
 from flask_login.utils import login_required
 from mib.forms.forms import MessageForm
-import json
 
 home = Blueprint("home", __name__)
 

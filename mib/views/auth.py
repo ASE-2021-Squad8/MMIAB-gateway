@@ -1,8 +1,7 @@
-from flask import Blueprint, flash, redirect, render_template, url_for, abort, request
+from flask import Blueprint, redirect, render_template, url_for, request
 from flask_login import login_required, login_user, logout_user
 from mib.forms.forms import LoginForm
 from mib.rao.user_manager import UserManager
-from mib.auth.user import User
 
 auth = Blueprint("auth", __name__)
 
@@ -54,4 +53,3 @@ def logout():
     """
     logout_user()
     return redirect(url_for("home.index"))
-

@@ -1,13 +1,21 @@
 import datetime
 import json
 
-from flask import Blueprint, redirect, render_template, url_for, request, abort, make_response, jsonify
+from flask import (
+    Blueprint,
+    redirect,
+    render_template,
+    url_for,
+    request,
+    abort,
+    make_response,
+    jsonify,
+)
 from flask_login import logout_user, login_required, current_user
 
 from mib.forms import UserForm
 from mib.forms.forms import BlackListForm, ChangePassForm
 from mib.rao.user_manager import UserManager
-from mib.auth.user import User
 
 
 users = Blueprint("users", __name__)
@@ -53,6 +61,7 @@ def create_user():
 
 
 @users.route("/password", methods=["GET", "POST"])
+@login_required
 def change_pass_user():  # noqa: E501
     """Render change password template
      # noqa: E501
@@ -87,6 +96,7 @@ def change_pass_user():  # noqa: E501
 
 
 @users.route("/content_filter", methods=["GET", "POST"])
+@login_required
 def content_filter():  # noqa: E501
     """Set content filter
      # noqa: E501
@@ -139,7 +149,7 @@ def black_list():  # noqa: E501
             result = UserManager.remove_from_blacklist(user_id, users)
         elif json_data["op"] == "add":
             result = UserManager.add_to_blacklist(user_id, users)
-        
+
         response = UserManager.get_blacklist(user_id)
         if response.status_code == 200:
             users = response.json()
@@ -154,6 +164,7 @@ def black_list():  # noqa: E501
 
 
 @users.route("/report", methods=["GET", "POST"])
+@login_required
 def report():  # noqa: E501
     """Report a user
      # noqa: E501
@@ -194,6 +205,7 @@ def search_user():  # noqa: E501
 
 
 @users.route("/unregister", methods=["GET"])
+@login_required
 def unregister():  # noqa: E501
     """Unregister the current_user
      # noqa: E501
@@ -221,6 +233,7 @@ def user_profile():  # noqa: E501
 
 
 @users.route("/user/edit_profile", methods=["GET", "POST"])
+@login_required
 def update_user():  # noqa: E501
     """Updates the fields for the current user # noqa: E501
 
@@ -237,7 +250,8 @@ def update_user():  # noqa: E501
             or request.form["textlastname"] == ""
             or request.form["textbirth"] == ""
             or request.form["textemail"] == ""
-            or datetime.datetime.strptime(request.form["textbirth"], "%Y-%m-%d") > datetime.datetime.today()
+            or datetime.datetime.strptime(request.form["textbirth"], "%Y-%m-%d")
+            > datetime.datetime.today()
         ):
             user = UserManager.get_user_by_id(current_user.id)
             return render_template(
