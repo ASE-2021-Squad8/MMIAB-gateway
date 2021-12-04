@@ -13,10 +13,9 @@
 		<dd>User mail: <b>{{ user.email }}</b></dd>
 		<dd>Date of birth: <b>{{ date }}</b></dd>
 	</dl>
-	<a href="{{url_for('users.change_data_user')}}" class="btn btn-success" tabindex="-1" role="button"
+	<a href="{{url_for('users.update_user')}}" class="btn btn-success" tabindex="-1" role="button"
 		aria-disabled="true">Edit profile</a>
 	<a href="{{url_for('users.change_pass_user')}}" class="btn btn-warning" tabindex="-1" role="button"
-		aria-disabled="true">Change
-		password</a>
+		aria-disabled="true">Change password</a>
 </div><br>
 {% endblock %}

@@ -52,12 +52,6 @@ def logout():
     Returns:
         Redirects the view to the home page
     """
-    print("LOGOUT")
     logout_user()
     return redirect(url_for("home.index"))
 
-
-def check_authenticated(user: User):
-    pass
-    # if not user.authenticated or user is None:
-    #     return abort(401, "Unauthenticated usage is not allowed")

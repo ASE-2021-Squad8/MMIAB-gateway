@@ -167,9 +167,8 @@ class UserManager:
         :param confpw: confirmation password, used to verify that the user has entered the currpw correctly
         """
         try:
-            url = cls.USERS_ENDPOINT + "/user/password/" + str(user_id),
             response = requests.put(
-                url,
+                cls.USERS_ENDPOINT + "/user/password/" + str(user_id),
                 json={"currentpassword": currpw, "newpassword": newpw, "confirmpassword": confpw},
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
@@ -259,3 +258,47 @@ class UserManager:
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
+            
+    @classmethod
+    def get_blacklist(cls, user_id: int):
+        """Get blacklisted users for user_id
+        """
+        try:
+            response = requests.get( 
+                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id), 
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def add_to_blacklist(cls, user_id, userlist_to_add):
+        """Add list of users to blacklist of user_id
+        """
+        try:
+            response = requests.put(
+                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
+                json={"op": "add", "users": userlist_to_add},
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def remove_from_blacklist(cls, user_id, userlist_to_remove):
+        """Remove list of users from blacklist of user_id
+        """
+        try:
+            response = requests.put(
+                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
+                json={"op": "delete", "users": userlist_to_remove},
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+
+    

@@ -5,9 +5,10 @@
 <h1>Settings</h1>
 <a href="/" class="btn btn-outline-primary">Homepage</a><br><br>
 
-<a href="{{url_for('users.user_profile')}}">My account</a><br>
-<a href="{{url_for('users.unregister')}}">Unregister</a><br>
+<a href="{{url_for('users.unregister')}}">My account</a><br>
 <a href="{{url_for('users.report')}}">Report a user</a><br>
-<a href="{{url_for('users.get_black_list')}}">Black list</a><br>
-<a href="{{url_for('users.content_filter')}}">Content filter</a>
+<a href="{{url_for('users.black_list')}}">Black list</a><br>
+<a href="{{url_for('users.content_filter')}}">Content filter</a><br><br>
+<a href="{{url_for('users.unregister')}}">Unregister</a>
 {% endblock %}
+

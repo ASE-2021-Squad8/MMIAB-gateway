@@ -97,7 +97,9 @@ paths:
           description: Renders the update_customer template, to allow the customer to modify its data
         302:
           description: Redirects to the customer profile page
-    delete:
+  
+  /unregister:
+    get:
       summary: Unregister the current_user
       tags: [ User ]
       description: Delete a user by its id
