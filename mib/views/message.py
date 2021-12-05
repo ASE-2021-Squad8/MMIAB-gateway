@@ -289,9 +289,9 @@ def save_draft():
 
     # Send the draft to the message ms
     if draft_id != "" and draft_id is not None:
-        response = MessageManager.update_draft(draft)
+        response = MessageManager.update_draft(draft_id, json.dumps(draft))
     else:
-        response = MessageManager.save_new_draft(draft)
+        response = MessageManager.save_new_draft(json.dumps(draft))
     if response.status_code == 200:
         return _get_result(jsonify({"message_id": draft_id}), "message.send_message")
     else:

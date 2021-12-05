@@ -168,3 +168,27 @@ class MessageManager:
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
+
+    @classmethod
+    def save_new_draft(cls, draft):
+        try:
+            response = requests.post(
+                cls.MESSAGE_ENDPOINT + "/message/draft",
+                json=draft,
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def update_draft(cls, draft_id: int, draft):
+        try:
+            response = requests.put(
+                cls.MESSAGE_ENDPOINT + "/message/draft/" + str(draft_id),
+                json=draft,
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
