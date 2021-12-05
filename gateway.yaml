@@ -627,17 +627,54 @@ paths:
       responses:
         200:
           description: Message deleted
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: 3
+                    format: int64
         400:
           description: Message already sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: -1
+                    format: int64
         401:
           description: Not enough points
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: -1
+                    format: int64
         404:
           description: Message not found
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: -1
+                    format: int64
+
   /message/bin/{message_id}:
     delete:
       tags:
         [Message]
-      summary: Delete a received message message
+      summary: Delete a received message 
       operationId: delete_received_message
       parameters:
         - name: message_id
