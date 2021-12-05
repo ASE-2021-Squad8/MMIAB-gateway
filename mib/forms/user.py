@@ -31,15 +31,10 @@ class UserForm(FlaskForm):
         validators=[DataRequired()]
     )
 
-    birthdate = DateField(
+    dateofbirth = DateField(
         'Birthday',
         validators=[AgeValidator(min_age=18)]
     )
 
-    phone = TelField(
-        'Phone',
-        validators=[DataRequired()]
-    )
-
     display = ['email', 'firstname', 'lastname', 'password',
-               'birthdate', 'phone']
+               'dateofbirth']

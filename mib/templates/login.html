@@ -4,6 +4,7 @@
 {% block content %}
 <form action="" method="POST">
 	<h1>Please sign in</h1>
+	<a href="/" class="btn btn-outline-primary">Homepage</a><br><br>
 	{{ form.hidden_tag() }}
 	<dl>
 		{% for field in form.display %}
@@ -18,7 +19,7 @@
 	</dl>
 	<p>
 		<input type=submit value="Publish" class="btn btn-dark">
-		<br>
+		<br><br>
 		<h7 style="color: red;"> {{ error }}</h7>
 </form>
 {% endblock %}

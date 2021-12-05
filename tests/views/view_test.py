@@ -28,8 +28,7 @@ class ViewTest(unittest.TestCase):
                 user.get('password'),
                 user.get('firstname'),
                 user.get('lastname'),
-                user.get('birthdate'),
-                user.get('phone')
+                user.get('dateofbirth'),
                 )
 
         rv = self.client.post(
@@ -53,7 +52,6 @@ class ViewTest(unittest.TestCase):
             'is_anonymous': False,
             'firstname': self.faker.first_name(),
             'lastname': self.faker.last_name(),
-            'birthdate': self.faker.date(),
-            'phone': self.faker.phone_number()
+            'dateofbirth': self.faker.date(),
         }
         return data

@@ -14,7 +14,7 @@ Press enable to activate a content filter that automatically censors bad words!<
 	<label for="enable_choice">Enable</label>
 	<input type="radio" id="disable_choice" name="filter" value="0">
 	<label for="disable_choice">Disable</label><br>
-	<button type="submit" formaction="{{url_for('users.set_content_filter')}}" class="btn btn-primary">Save</button><br><br>
+	<button type="submit" formaction="{{url_for('users.content_filter')}}" class="btn btn-primary">Save</button><br><br>
 </form>
 
 {{feedback}}

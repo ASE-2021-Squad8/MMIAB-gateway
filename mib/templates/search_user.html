@@ -4,7 +4,6 @@
 {% block content %}
 <h1>Search for a user</h1>
 <a href="/" class="btn btn-outline-primary">Homepage</a><br><br>
-
 <br><label>Search <input id="search" type="text" placeholder="Type to search"></label><br><br>
 <table class="table table-light" id="users">
 	<thead>
@@ -18,7 +17,8 @@
 {% endblock %}
 {% block scripts %}
 <script>
-	$.get("{{url_for('users.get_users_list_json')}}", function (data) { buildTable(data); });
+	var data = {{ userslist|safe }}
+	buildTable(data);
 
 	function buildTable(data) {
 		console.log(data);
