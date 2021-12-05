@@ -9,14 +9,14 @@ from flask import (
     abort,
     jsonify,
 )
-from flask.wrappers import Response
-from flask_login import login_user, login_required, current_user
+from flask_login import login_required, current_user
 from mib.forms.forms import MessageForm
-from datetime import date, datetime
+from mib.rao.user_manager import UserManager
+from datetime import datetime
 import os
-import hashlib
-import pathlib
 import json
+import base64
+from re import search
 
 from mib.rao.message_manager import MessageManager
 
@@ -44,7 +44,8 @@ def attachment_get(message_id):  # noqa: E501
     elif response.status_code == 404:
         return abort(500)
 
-msg.route("/message/bin/<message_id>",methods=['DELETE'])
+
+@msg.route("/message/bin/<message_id>", methods=["DELETE"])
 @login_required
 def delete_received_message(message_id):  # noqa: E501
     """Delete a received message
@@ -54,15 +55,14 @@ def delete_received_message(message_id):  # noqa: E501
 
     :rtype: None
     """
-    user_id=current_user.id
+    user_id = current_user.id
     response = MessageManager.set_message_is_delete(message_id, user_id)
-    if response.status_code==200:
+    if response.status_code == 200:
         return jsonify({"message_id": message_id})
-    elif response.status_code==400:
+    elif response.status_code == 400:
         return _get_result(None, ERROR_PAGE, True, 404, "Wrong message id")
-    elif response.status_code==404:
+    elif response.status_code == 404:
         return _get_result(None, ERROR_PAGE, True, 404, "User not found")
-
 
 
 @msg.route("/message/received/metadata")
@@ -73,11 +73,10 @@ def get_all_received_messages_metadata():  # noqa: E501
     """
     user_id = current_user.id
     response = MessageManager.get_received_messages_metadata(user_id)
-    if response.status_code==200:
+    if response.status_code == 200:
         return jsonify(response)
-    if response.status_code==404:
+    if response.status_code == 404:
         return abort("An error occured during retrieving the metadata")
-   
 
 
 @msg.route("/sent/metadata", methods=["GET"])
@@ -89,11 +88,10 @@ def get_all_sent_messages_metadata():  # noqa: E501
     """
     user_id = current_user.id
     response = MessageManager.get_sent_messages_metadata(user_id)
-    if response.status_code==200:
-        return  jsonify(response)
-    if response.status_code==404:
+    if response.status_code == 200:
+        return jsonify(response)
+    if response.status_code == 404:
         return abort("An error occured during retrieving the metadata")
-    
 
 
 @msg.route("/calendar", methods=["GET"])
@@ -168,57 +166,30 @@ def send_message():  # noqa: E501
 
         errors = 0
         for recipient in recipients:
-            try:
-                # attempt to retrieve the draft, if present
-                msg = MessageManager.unmark_draft(
-                    current_user.id,
-                    int(
-                        -1
-                        if _not_valid_string(request.form["draft_id"])
-                        else request.form["draft_id"]
-                    ),
-                )
-            except KeyError:
-                # otherwise build the message from scratch
-                msg = dict()
-                msg["is_draft"] = False
-                msg["is_delivered"] = False
-                msg["is_read"] = False
-
+            # Check if the message is a draft
+            msg = dict()
             msg["delivery_date"] = delivery_date
             msg["text"] = request.form["text"]
             msg["sender"] = int(current_user.id)
             msg["recipient"] = int(recipient)
+            msg["message_id"] = request.form["draft_id"]
+            msg["media"] = ""
 
-            if "attachment" in request.files and not _not_valid_string(
-                request.files["attachment"].filename
+            # Check the attachment
+            if (
+                "attachment" in request.files
+                and request.files["attachment"].filename != ""
             ):
                 file = request.files["attachment"]
 
                 if _extension_allowed(file.filename):
-                    filename = _generate_filename(file)
-
-                    # if the draft already has a file, delete it
-                    if msg.media is not None and msg.media != "":
-                        try:  # pragma: no cover
-                            # unlikely to ever happen, don't include in coverage
-                            os.unlink(
-                                os.path.join(os.getenv["UPLOAD_FOLDER"], msg.media)
-                            )
-                        except:
-                            # if we failed to delete the file from the disk then something is wrong
-                            return _get_result(
-                                None, ERROR_PAGE, True, 500, "Internal server error"
-                            )
-
-                    file.save(os.path.join(os.getenv["UPLOAD_FOLDER"], filename))
-                    msg.media = filename
+                    msg["media"] = base64.b64encode(file).decode("utf-8")
                 else:
                     return _get_result(
                         None, ERROR_PAGE, True, 400, "File extension not allowed"
                     )
 
-            # send message 
+            # send message
             response = MessageManager.send_message(json.dumps(msg))
             if response.status_code != 201:
                 errors += 1
@@ -233,11 +204,7 @@ def send_message():  # noqa: E501
             )
 
 
-def _not_valid_string(text):
-    return text is None or text == "" or text.isspace()
-
-
-@msg.routes("/lottery/<message_id>")
+@msg.routes("/lottery/<message_id>", methods=["DELETE"])
 def delete_message_lottery_points(message_id):  # noqa: E501
     """Delete a message spending points
 
@@ -249,26 +216,14 @@ def delete_message_lottery_points(message_id):  # noqa: E501
     :rtype: None
     """
     response = MessageManager.delete_message_lottery_points(message_id)
-    
-    if response.status_code == 200:
-        return jsonify({
-            "message_id": message_id
-        })
-    elif response.status_code == 400:
-        return jsonify({
-            "message_id": -1
-        })
-    elif response.status_code == 401:
-        return jsonify({
-            "message_id": -1
-        })
-    elif response.status_code == 404:
-        return jsonify({
-            "message_id": -1
-        })
+    status_code = response.status_code
+    if status_code == 200:
+        return jsonify({"message_id": message_id})
+    elif status_code == 400 or status_code == 401 or status_code == 404:
+        return jsonify({"message_id": -1})
 
 
-@msg.routes("/message/sent/<year>/<month>/<day>")
+@msg.routes("/message/sent/<day>/<month>/<year>")
 @login_required
 def get_daily_messages(day, month, year):  # noqa: E501
     """Gets all messages scheduled for a day
@@ -285,9 +240,118 @@ def get_daily_messages(day, month, year):  # noqa: E501
     if day > 31 or month + 1 > 12:
         return _get_result(None, ERROR_PAGE, True, 404, "Invalid date")
     else:
-        user_id=current_user.id
-        messages = MessageManager.get_day_message(year,month,day,user_id)
-        return jsonify(messages)
+        user_id = current_user.id
+        response = MessageManager.get_day_message(year, month, day, user_id)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return abort(500)
+
+
+@msg.route("/message/draft", methods=["GET"])
+def get_all_drafts():
+    """Get all the drafts for the current user"""
+    response = MessageManager.get_all_drafts(current_user.id)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return abort(500)
+
+
+@msg.route("/message/draft", methods=["POST"])
+def save_draft():
+    """Save a new draft"""
+    draft = dict()
+    draft_id = request.form["draft_id"]
+    if _not_valid_string(request.form["text"]):
+        return _get_result(
+            None, ERROR_PAGE, True, 400, "Message to draft cannot be empty"
+        )
+    date = request.form["delivery_date"]
+    draft["delivery_date"] = (
+        datetime.fromisoformat(date) if not _not_valid_string(date) else None
+    )
+    draft["text"] = request.form["text"]
+    draft["sender"] = current_user.id
+    if "recipient" in request.form and request.form["recipient"] != "":
+        draft["recipient"] = request.form["recipient"]
+
+    # Check the attachment
+    if "attachment" in request.files and request.files["attachment"].filename != "":
+        file = request.files["attachment"]
+
+        if _extension_allowed(file.filename):
+            draft["media"] = base64.b64encode(file).decode("utf-8")
+        else:
+            return _get_result(
+                None, ERROR_PAGE, True, 400, "File extension not allowed"
+            )
+
+    # Send the draft to the message ms
+    if draft_id != "" and draft_id is not None:
+        response = MessageManager.update_draft(draft)
+    else:
+        response = MessageManager.save_new_draft(draft)
+    if response.status_code == 200:
+        return _get_result(jsonify({"message_id": draft_id}), "message.send_message")
+    else:
+        return _get_result(None, ERROR_PAGE, True, 500, "Internal server error")
+
+
+@msg.route("/api/message/read_message/<id>")
+def read_msg(id):
+    """
+    Read the message with id and send a notification to the sender
+    """
+    response = MessageManager.get_message(id)
+    msg = response.json()
+    if response.status_code == 200:
+        if not msg["is_read"]:
+            # If it's the first time reading the message, send a notification to the message sender
+            response = MessageManager.update_message(id, "is_read", True)
+            if response.status_code == 200:
+                response = UserManager.get_user_email(msg["sender"])
+                if response.status_code == 200:
+                    sender = response.json()["email"]
+                response = UserManager.get_user_email(msg["recipient"])
+                if response.status_code == 200:
+                    receiver = response.json()["email"]
+                MessageManager.send_notification(sender, receiver)
+            elif response.status_code == 404:
+                return abort(
+                    404, json.dumps({"msg_read": False, "error": "message not found"})
+                )
+            else:
+                return abort(
+                    500,
+                    json.dumps(
+                        {
+                            "msg_read": False,
+                            "error": "an error occurred while updating the message state",
+                        }
+                    ),
+                )
+    else:
+        return abort(
+            500,
+            json.dumps(
+                {
+                    "msg_read": False,
+                    "error": "an error occurred while updating the message state",
+                }
+            ),
+        )
+
+
+#########################
+#                       #
+#   UTILITY FUNCTIONS   #
+#                       #
+#########################
+
+
+def _not_valid_string(text):
+    return text is None or text == "" or text.isspace()
 
 
 def _get_result(json_object, page, error=False, status=200, message=""):
@@ -329,36 +393,5 @@ def _extension_allowed(filename):
     """
 
     # Of course, this is a toy, nothing stops you from sending an .exe as a .jpg :)
-    return pathlib.Path(filename).suffix.lower() in {
-        ".jpg",
-        ".jpeg",
-        ".JPG",
-        ".JPEG",
-    }
-
-
-def _generate_filename(file):
-    """Generates a filename for an uploaded file
-
-    :param file: file handle
-    :type file: file
-    :returns: a filename suited for storage
-    :rtype: str
-    """
-
-    # To avoid clashes, generate a filename by hashing
-    # the file's contents, the sender and the time
-    sha256 = hashlib.sha256()
-    while True:
-        # Read in chunks of 64kb to contain memory usage
-        data = file.read(65536)
-        if not data:
-            break
-        sha256.update(data)
-    sha256.update(getattr(current_user, "email").encode("utf-8"))
-    sha256.update(str(int(time.time())).encode("utf-8"))
-
-    # Seek back to the origin of the file (otherwise save will fail)
-    file.seek(0)
-
-    return sha256.hexdigest() + pathlib.Path(file.filename).suffix.lower()
+    extensions = [".jpg", ".jpeg", ".JPG", ".JPEG"]
+    return any(ext in filename for ext in extensions)
