@@ -1,6 +1,9 @@
-from flask import Blueprint, redirect, render_template, url_for, flash, request
+from flask import Blueprint, redirect, render_template, url_for, flash, request, session, abort
 from flask_login import (login_user, login_required)
 from mib.forms.forms import MessageForm
+from datetime import date, datetime
+
+from mib.rao.message_manager import MessageManager
 
 msg = Blueprint("message", __name__)
 
@@ -61,7 +64,7 @@ def get_calendar():  # noqa: E501
     """
     return render_template("calendar.html")
 
-
+@msg.route('/message/<message_id>')
 def get_message(message_id):  # noqa: E501
     """Get a message by id
 
@@ -72,8 +75,14 @@ def get_message(message_id):  # noqa: E501
 
     :rtype: Message
     """
-    return 'do some magic!'
+    response=MessageManager.get_received_message(message_id)
+    if response.status_code==200:
+        return response
+    if response.status_code==404:
+        return abort(404, "Message not found")
 
+    return abort("An error occurred during retrieving the message")
+    
 @msg.route('/mailbox',methods=['GET'])
 def mailbox():  # noqa: E501
     """Render mailboxpage
@@ -82,17 +91,23 @@ def mailbox():  # noqa: E501
     """
     return render_template("mailbox.html")
 
-@msg.route('/message', methods=["GET"])
+@msg.route('/message', methods=["GET, POST"])
 def send_message_page():  # noqa: E501
     """Render message page
      # noqa: E501
     :rtype: None
     """
+    if request.method=="GET":
+        message = ""
+        if "message" in session:
+            message = session["message"]
+            session.pop("message")
+        return render_template("send_message.html", message=message, form=MessageForm())
+    else:
+        send_message()
 
-    message=None
-
-    return render_template("send_message.html", message=message, form=MessageForm())
-
+def _not_valid_string(text):
+    return text is None or text == "" or text.isspace()
 
 def send_message(body):  # noqa: E501
     """Send message
@@ -104,9 +119,7 @@ def send_message(body):  # noqa: E501
 
     :rtype: None
     """
-    if connexion.request.is_json:
-        body = Message.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    
 
 
 def delete_message_lottery_points(message_id):  # noqa: E501

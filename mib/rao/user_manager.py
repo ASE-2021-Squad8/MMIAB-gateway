@@ -40,14 +40,16 @@ class UserManager:
         :return: User obj with email=user_email
         """
         try:
-            response = requests.get(cls.USERS_ENDPOINT + 
+            response = requests.get(cls.USERS_ENDPOINT + "/user_email/" + user_email,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
             user = None
-
+            
             if response.status_code == 200:
                 user = User.build_from_json(json_payload)
-
+            else if response.status_code == 404:
+                pass
+            else
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
