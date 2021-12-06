@@ -28,13 +28,30 @@ function write_message(data, day, month, year) {
     var display_html = `<h3>Your daily messages</h3><hr>`
     for (var i = 0; i < data.length; i++) {
       current_msg = data[i];
-      var text = current_msg.future ? "Will be sent at" : "Sent at";
+      recipient = "";
+      $.ajax({
+          url: '/api/user/' + current_msg.recipient + "/public",
+          type: 'GET',
+          async: false,
+          dataType: 'json',
+          success: function (response) { recipient = response },
+      });
+      sender = "";
+      $.ajax({
+          url: '/api/user/' + current_msg.sender + "/public",
+          type: 'GET',
+          async: false,
+          dataType: 'json',
+          success: function (response) { sender = response },
+      });
+
+      var text = current_msg.is_delivered ? "Sent at" : "Will be sent at";
       display_html += `
-              <h4> ${text} ${current_msg.delivered}</h4>
-              <h5>Recipient: ${user.email}</h5><br>
+              <h4> ${text} ${current_msg.delivery_date}</h4>
+              <h5>Recipient: ${recipient.email}</h5><br>
               ${current_msg.text}<br><hr>
               `;
-      if (current_msg.candelete) {
+      if (!current_msg.is_delivered && sender.points >= 60) {
         display_html += `<div><button type="button" class="btn btn-danger" onclick="delete_and_reload(${current_msg.message_id},${day}, ${month}, ${year})">Withdraw</button></div></br>`;
       }
     }
