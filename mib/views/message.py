@@ -74,7 +74,9 @@ def get_all_received_messages_metadata():  # noqa: E501
     if response.status_code == 200:
         return jsonify(response.json())
     else:
-        return abort(response.status_code, "An error occured while retrieving the metadata")
+        return abort(
+            response.status_code, "An error occured while retrieving the metadata"
+        )
 
 
 @msg.route("/sent/metadata", methods=["GET"])
@@ -89,7 +91,9 @@ def get_all_sent_messages_metadata():  # noqa: E501
     if response.status_code == 200:
         return jsonify(response.json())
     else:
-        return abort(response.status_code, "An error occured while retrieving the metadata")
+        return abort(
+            response.status_code, "An error occured while retrieving the metadata"
+        )
 
 
 @msg.route("/calendar", methods=["GET"])
@@ -220,7 +224,7 @@ def delete_message_lottery_points(message_id):  # noqa: E501
     if response.status_code == 200:
         return jsonify({"message_id": message_id})
     else:
-        #error 400, 401, 404
+        # error 400, 401, 404
         return jsonify({"message_id": -1})
 
 
@@ -344,6 +348,16 @@ def read_msg(id):
                 }
             ),
         )
+
+
+@msg.route("/api/user/recipients", methods=["GET"])
+def get_recipients():
+    """Get all the recipients for the current user"""
+    response = UserManager.get_recipients(current_user.id)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return abort(500)
 
 
 #########################
