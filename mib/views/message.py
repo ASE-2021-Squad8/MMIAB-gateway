@@ -253,7 +253,7 @@ def get_daily_messages(day: int, month: int, year: int):  # noqa: E501
 @msg.route("/message/draft", methods=["GET"])
 def get_all_drafts():
     """Get all the drafts for the current user"""
-    response = MessageManager.get_all_drafts(current_user.id)
+    response = MessageManager.get_all_drafts_for_user(current_user.id)
     if response.status_code == 200:
         return response.json()
     else:
