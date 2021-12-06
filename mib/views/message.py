@@ -119,7 +119,7 @@ def get_message(message_id):  # noqa: E501
     return jsonify(response)
 
 
-@msg.route("/mailbox", methods=["GET"])
+@msg.route("/message/mailbox", methods=["GET"])
 @login_required
 def mailbox():  # noqa: E501
     """Render mailboxpage
@@ -204,7 +204,7 @@ def send_message():  # noqa: E501
             )
 
 
-@msg.routes("/lottery/<message_id>", methods=["DELETE"])
+@msg.route("/lottery/<message_id>", methods=["DELETE"])
 def delete_message_lottery_points(message_id):  # noqa: E501
     """Delete a message spending points
 
@@ -223,7 +223,7 @@ def delete_message_lottery_points(message_id):  # noqa: E501
         return jsonify({"message_id": -1})
 
 
-@msg.routes("/message/sent/<day>/<month>/<year>")
+@msg.route("/message/sent/<day>/<month>/<year>", methods=['GET'])
 @login_required
 def get_daily_messages(day, month, year):  # noqa: E501
     """Gets all messages scheduled for a day
