@@ -154,6 +154,17 @@ class MessageManager:
             return abort(500)
 
     @classmethod
+    def get_all_drafts_for_user(cls, user_id: int):
+        try:
+            response = requests.get(
+                cls.MESSAGE_ENDPOINT + "/message/" + str(user_id) + "/draft",
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
     def send_notification(cls, sender: str, receiver: str):
         try:
             response = requests.put(
