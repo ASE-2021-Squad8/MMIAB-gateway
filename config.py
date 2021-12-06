@@ -11,7 +11,7 @@ class Config(object):
     REQUESTS_TIMEOUT_SECONDS = float(os.getenv("REQUESTS_TIMEOUT_SECONDS", 5))
 
     # configuring redis
-    REDIS_HOST = os.getenv('REDIS_HOST', 'redis_cache')
+    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT = os.getenv('REDIS_PORT', 6379)
     REDIS_DB = os.getenv('REDIS_DB', '0')
     REDIS_URL = 'redis://%s:%s/%s' % (

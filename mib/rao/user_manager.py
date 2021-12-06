@@ -327,3 +327,14 @@ class UserManager:
             return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
+
+    @classmethod
+    def get_user_public(cls, user_id: int):
+        try:
+            response = requests.get(
+                cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/public",
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)

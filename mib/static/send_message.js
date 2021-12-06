@@ -22,12 +22,17 @@ function get_recipient() {
 
 $(document).ready(function () {
     get_recipient();
-    $.get('/message/draft', buildTable)
+    $.ajax({
+		url: '/message/draft',
+		type: 'GET',
+		dataType: 'json',
+		success: buildTable
+	})
 });
 
 function buildTable(data) {
     var table = document.getElementById('draftsTable')
-
+	
     if (data.length == 0) {
         table.innerHTML = "No drafts!"
         return
@@ -43,17 +48,24 @@ function buildTable(data) {
     </thead>`
 
     for (var i = 0; i < data.length; i++) {
-        msg = data[i]
+		msg = ""
+		$.ajax({
+            url: '/api/message/draft/' + data[i].id,
+            type: 'GET',
+            async: false,
+            dataType: 'json',
+            success: function (response) { msg = response }
+        })
         user = ""
         $.ajax({
-            url: '/api/user/' + msg.recipient,
+            url: '/api/user/' + msg.recipient + "/public",
             type: 'GET',
             async: false,
             dataType: 'json',
             success: function (response) { user = response }
         })
 
-        if (msg.media) {
+        if (data[i].has_media) {
             msg.text += `<a class="btn btn-secondary" href="${MEDIA_URL}">View attachment</a>`.replace("MEDIA", msg.media)
         }
 
@@ -70,12 +82,12 @@ function buildTable(data) {
         row += `<td>${msg.text}</td>
                 <td>`
 
-        if (msg.media) {
-            row += `<input id="removeattachment" type="button" class="btn btn-outline-primary" value="Purge attachment" onclick="removeAttachment(${msg.message_id})"/> `
+        if (data[i].has_media) {
+            row += `<input id="removeattachment" type="button" class="btn btn-outline-primary" value="Purge attachment" onclick="removeAttachment(${data[i].id})"/> `
         }
 
-        row += `<input id="editdraft" type="button" value="Edit" class="btn btn-primary" onclick="editDraft(${msg.message_id})" />
-                <input id="deldraft" type="button" class="btn btn-danger" value="Delete" onclick="deleteDraft(${msg.message_id})" />
+        row += `<input id="editdraft" type="button" value="Edit" class="btn btn-primary" onclick="editDraft(${data[i].id})" />
+                <input id="deldraft" type="button" class="btn btn-danger" value="Delete" onclick="deleteDraft(${data[i].id})" />
                 </td></tr>`
 
         table.innerHTML += row

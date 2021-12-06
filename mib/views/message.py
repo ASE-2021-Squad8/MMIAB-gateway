@@ -9,6 +9,7 @@ from flask import (
     abort,
     jsonify,
 )
+from flask.signals import message_flashed
 from flask_login import login_required, current_user
 from mib.forms.forms import MessageForm
 from mib.rao.user_manager import UserManager
@@ -119,7 +120,7 @@ def get_message(message_id):  # noqa: E501
     """
     response = MessageManager.get_message(message_id)
     if response.status_code == 200:
-        return response.json()
+        return json.dumps(response.json())
     else:
         return abort(500)
 
@@ -149,12 +150,9 @@ def send_message():  # noqa: E501
         return render_template("send_message.html", message=message, form=MessageForm())
     else:
         now = datetime.now()
-        s_date = request.form["delivery_date"]
-        delivery_date = (
-            datetime.fromisoformat(s_date) if not _not_valid_string(s_date) else None
-        )
+        delivery_date = request.form["delivery_date"]
         # check parameters
-        if delivery_date is None or delivery_date < now:
+        if delivery_date is None or datetime.strptime(delivery_date, "%Y-%m-%dT%H:%M") < now:
             return _get_result(
                 None, "/send_message", True, 400, "Delivery date in the past"
             )
@@ -177,7 +175,8 @@ def send_message():  # noqa: E501
             msg["text"] = request.form["text"]
             msg["sender"] = int(current_user.id)
             msg["recipient"] = int(recipient)
-            msg["message_id"] = request.form["draft_id"]
+            if not _not_valid_string(request.form["draft_id"]):
+                msg["message_id"] = int(request.form["draft_id"])
             msg["media"] = ""
 
             # Check the attachment
@@ -188,14 +187,14 @@ def send_message():  # noqa: E501
                 file = request.files["attachment"]
 
                 if _extension_allowed(file.filename):
-                    msg["media"] = base64.b64encode(file).decode("utf-8")
+                    msg["media"] = base64.b64encode(file.read()).decode("utf-8")
                 else:
                     return _get_result(
                         None, ERROR_PAGE, True, 400, "File extension not allowed"
                     )
 
             # send message
-            response = MessageManager.send_message(json.dumps(msg))
+            response = MessageManager.send_message(msg)
             if response.status_code != 201:
                 errors += 1
 
@@ -247,7 +246,7 @@ def get_daily_messages(day: int, month: int, year: int):  # noqa: E501
     else:
         response = MessageManager.get_day_message(year, month, day, current_user.id)
         if response.status_code == 200:
-            return response.json()
+            return json.dumps(response.json())
         elif response.status_code == 404:
             return jsonify(dict())
         else:
@@ -259,7 +258,7 @@ def get_all_drafts():
     """Get all the drafts for the current user"""
     response = MessageManager.get_all_drafts_for_user(current_user.id)
     if response.status_code == 200:
-        return response.json()
+        return json.dumps(response.json())
     else:
         return abort(500)
 
@@ -274,20 +273,19 @@ def save_draft():
             None, ERROR_PAGE, True, 400, "Message to draft cannot be empty"
         )
     date = request.form["delivery_date"]
-    draft["delivery_date"] = (
-        datetime.fromisoformat(date) if not _not_valid_string(date) else None
-    )
+    if not _not_valid_string(date):
+        draft["delivery_date"] = date
     draft["text"] = request.form["text"]
     draft["sender"] = current_user.id
     if "recipient" in request.form and request.form["recipient"] != "":
-        draft["recipient"] = request.form["recipient"]
+        draft["recipient"] = int(request.form["recipient"])
 
     # Check the attachment
     if "attachment" in request.files and request.files["attachment"].filename != "":
         file = request.files["attachment"]
 
         if _extension_allowed(file.filename):
-            draft["media"] = base64.b64encode(file).decode("utf-8")
+            draft["media"] = base64.b64encode(file.read()).decode("utf-8")
         else:
             return _get_result(
                 None, ERROR_PAGE, True, 400, "File extension not allowed"
@@ -295,9 +293,9 @@ def save_draft():
 
     # Send the draft to the message ms
     if draft_id != "" and draft_id is not None:
-        response = MessageManager.update_draft(draft_id, json.dumps(draft))
+        response = MessageManager.update_draft(draft_id, draft)
     else:
-        response = MessageManager.save_new_draft(json.dumps(draft))
+        response = MessageManager.save_new_draft(draft)
 
     if response.status_code == 200:
         return _get_result(jsonify({"message_id": draft_id}), "message.send_message")
@@ -350,12 +348,34 @@ def read_msg(id):
         )
 
 
-@msg.route("/api/user/recipients", methods=["GET"])
-def get_recipients():
-    """Get all the recipients for the current user"""
-    response = UserManager.get_recipients(current_user.id)
+@msg.route("/api/message/draft/<id>", methods=["GET", "DELETE"])
+def handle_draft(id):
+    if request.method == "GET":
+        response = MessageManager.get_draft(id)
+        if response.status_code == 200:
+            return json.dumps(response.json())
+        else:
+            return abort(500)
+    elif request.method == "DELETE":
+        response = MessageManager.delete_draft(id)
+        if response.status_code == 200:
+            return "200"
+        else:
+            return abort(500)
+
+
+@msg.route("/api/message/draft/<id>/attachment", methods=["DELETE"])
+def remove_attachment(id):
+    response = MessageManager.get_draft(id)
     if response.status_code == 200:
-        return response.json()
+        draft = response.json()
+        draft["media"] = ""
+        print("DRAFT", draft)
+        response = MessageManager.update_draft(id, draft)
+        if response.status_code == 200:
+            return json.dumps(response.json())
+        else:
+            return abort(500)
     else:
         return abort(500)
 
@@ -387,7 +407,7 @@ def _get_result(json_object, page, error=False, status=200, message=""):
     :returns: json in test mode or rendered template
     :rtype: json
     """
-    testing = "testing" == os.getenv["FLASK_ENV"]
+    testing = "testing" == os.getenv("FLASK_ENV")
     if error and testing:
         abort(status, message)
     elif error:  # pragma: no cover

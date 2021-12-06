@@ -11,6 +11,7 @@ from flask import (
     make_response,
     jsonify,
 )
+from flask.wrappers import Response
 from flask_login import logout_user, login_required, current_user
 
 from mib.forms import UserForm
@@ -292,3 +293,22 @@ def users_list():  # noqa: E501
     response = UserManager.get_users_list_public()
     users = response.json()
     return render_template("users.html", users=users)
+
+
+@users.route("/api/user/recipients", methods=["GET"])
+def get_recipients():
+    """Get all the recipients for the current user"""
+    response = UserManager.get_recipients(current_user.id)
+    if response.status_code == 200:
+        return json.dumps(response.json())
+    else:
+        return abort(500)
+
+
+@users.route("/api/user/<id>/public", methods=["GET"])
+def get_user_public(id):
+    response = UserManager.get_user_public(id)
+    if response.status_code == 200:
+        return json.dumps(response.json())
+    else:
+        return abort(500)

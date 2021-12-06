@@ -75,7 +75,10 @@ class MessageManager:
 
         try:
             response = requests.get(
-                cls.MESSAGE_ENDPOINT + "/message/" + str(user_id) + "/received/metadata",
+                cls.MESSAGE_ENDPOINT
+                + "/message/"
+                + str(user_id)
+                + "/received/metadata",
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
@@ -135,7 +138,7 @@ class MessageManager:
         try:
             response = requests.put(
                 cls.MESSAGE_ENDPOINT + "/message",
-                json={"message_id": message_id, "attribute": attribute, "value": value},
+                json={"message_id": int(message_id), "attribute": attribute, "value": value},
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
@@ -198,6 +201,17 @@ class MessageManager:
             response = requests.put(
                 cls.MESSAGE_ENDPOINT + "/message/draft/" + str(draft_id),
                 json=draft,
+                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+            )
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def delete_draft(cls, draft_id: int):
+        try:
+            response = requests.delete(
+                cls.MESSAGE_ENDPOINT + "/message/draft/" + str(draft_id),
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
