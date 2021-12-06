@@ -63,7 +63,6 @@ function buildTable(data) {
             async: false,
             dataType: 'json',
             success: function (response) { user = response },
-			failure: function () { console.log("NOOOOOOOOO") }
         })
 
         if (data[i].has_media) {

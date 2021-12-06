@@ -14,13 +14,22 @@ function buildTableReceived(data) {
     
     for (var i = 0; i < data.length; i++) {
         msg = JSON.parse(data[i]);
+        user = "";
+        $.ajax({
+            url: '/api/user/' + msg.recipient + "/public",
+            type: 'GET',
+            async: false,
+            dataType: 'json',
+            success: function (response) { user = response },
+        });
+
         var row = `<tr>
-							<td style="text-align:center">${msg.firstname + " " + msg.lastname}</td>
-                            <td style="text-align:center">${msg.email}</td>
-							<td style="text-align:center"><button onclick="open_message_received(${msg.id_message})" class="btn btn-success">Open</button></td>
-							<td style="text-align:center"><button onclick="reply_message('${msg.email}', ${msg.sender_id})" class="btn btn-primary">Reply</button></td>
-							<td style="text-align:center"><button onclick="forward_message('${msg.email}','${msg.id_message}')" class="btn btn-primary">Forward</button></td>
-							<td style="text-align:center"><button onclick="delete_message(${msg.id_message})" class="btn btn-danger">Delete</button></td>
+							<td style="text-align:center">${user.firstname + " " + user.lastname}</td>
+                            <td style="text-align:center">${user.email}</td>
+							<td style="text-align:center"><button onclick="open_message_received(${msg.id})" class="btn btn-success">Open</button></td>
+							<td style="text-align:center"><button onclick="reply_message('${user.email}', ${msg.sender})" class="btn btn-primary">Reply</button></td>
+							<td style="text-align:center"><button onclick="forward_message('${user.email}','${msg.id}')" class="btn btn-primary">Forward</button></td>
+							<td style="text-align:center"><button onclick="delete_message(${msg.id})" class="btn btn-danger">Delete</button></td>
 							
 					  </tr>`;
         table.innerHTML += row;
@@ -39,11 +48,20 @@ function buildTableSent(data) {
 </thead>`
     for (var i = 0; i < data.length; i++) {
         msg = data[i];
+        user = "";
+        $.ajax({
+            url: '/api/user/' + msg.recipient + "/public",
+            type: 'GET',
+            async: false,
+            dataType: 'json',
+            success: function (response) { user = response },
+        });
+
         var row = `<tr>
-								<td style="text-align:center">${msg.firstname + " " + msg.lastname}</td>
-								<td style="text-align:center">${msg.email}</tb>
-								<td style="text-align:center"><button onclick="open_message_sent(${msg.id_message})" class="btn btn-success">Open</button></td>
-								<td style="text-align:center"><button onclick="forward_message('${msg.email}','${msg.id_message}', true)" class="btn btn-primary">Forward</button></td>
+								<td style="text-align:center">${user.firstname + " " + user.lastname}</td>
+								<td style="text-align:center">${user.email}</tb>
+								<td style="text-align:center"><button onclick="open_message_sent(${msg.id})" class="btn btn-success">Open</button></td>
+								<td style="text-align:center"><button onclick="forward_message('${user.email}','${msg.id}', true)" class="btn btn-primary">Forward</button></td>
 						</tr>`;
         table.innerHTML += row;
     }
