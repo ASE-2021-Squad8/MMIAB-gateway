@@ -119,7 +119,7 @@ def get_message(message_id):  # noqa: E501
     """
     response = MessageManager.get_message(message_id)
     if response.status_code == 200:
-        return jsonify(response.json())
+        return response.json()
     else:
         return abort(500)
 
