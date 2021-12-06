@@ -116,7 +116,12 @@ def get_message(message_id):  # noqa: E501
     :rtype: Message
     """
     response = MessageManager.get_message(message_id)
-    return jsonify(response)
+    if response.status_code==200:
+        return jsonify(response)
+    elif response.status_code==404:
+        return  _get_result(
+                None, "/message", True, 404, "Message not Found"
+            )
 
 
 @msg.route("/message/mailbox", methods=["GET"])
@@ -244,8 +249,10 @@ def get_daily_messages(day, month, year):  # noqa: E501
         response = MessageManager.get_day_message(year, month, day, user_id)
         if response.status_code == 200:
             return response.json()
-        else:
-            return abort(500)
+        elif response.status_code==404:
+            return  _get_result(
+                None, "/message/sent", True, 400, "User id not found"
+            ) 
 
 
 @msg.route("/message/draft", methods=["GET"])
