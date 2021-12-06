@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flask_ckeditor import CKEditor
 from flask_bootstrap import Bootstrap
 from flask_environments import Environments
 
@@ -20,6 +21,10 @@ def create_app():
     global login
 
     app = Flask(__name__, instance_relative_config=True)
+
+    # Load CKEditor
+    app.config["CKEDITOR_PKG_TYPE"] = "basic"
+    _ = CKEditor(app)
 
     flask_env = os.getenv('FLASK_ENV', 'None')
     if flask_env == 'development':

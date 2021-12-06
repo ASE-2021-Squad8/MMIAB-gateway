@@ -63,7 +63,7 @@ def delete_received_message(message_id):  # noqa: E501
         return abort(500)
 
 
-@msg.route("/message/received/metadata")
+@msg.route("/received/metadata")
 def get_all_received_messages_metadata():  # noqa: E501
     """Get all receied messages metadata of an user
      # noqa: E501
@@ -72,7 +72,7 @@ def get_all_received_messages_metadata():  # noqa: E501
     user_id = current_user.id
     response = MessageManager.get_received_messages_metadata(user_id)
     if response.status_code == 200:
-        return jsonify(response)
+        return jsonify(response.json())
     else:
         return abort(500, "An error occured during retrieving the metadata")
 
@@ -87,7 +87,7 @@ def get_all_sent_messages_metadata():  # noqa: E501
     user_id = current_user.id
     response = MessageManager.get_sent_messages_metadata(user_id)
     if response.status_code == 200:
-        return jsonify(response)
+        return jsonify(response.json())
     else:
         return abort(500, "An error occured during retrieving the metadata")
 
@@ -115,7 +115,7 @@ def get_message(message_id):  # noqa: E501
     """
     response = MessageManager.get_message(message_id)
     if response.status_code == 200:
-        return jsonify(response)
+        return jsonify(response.json())
     else:
         return abort(500)
 
@@ -130,7 +130,7 @@ def mailbox():  # noqa: E501
     return render_template("mailbox.html")
 
 
-@msg.route("/message", methods=["GET, POST"])
+@msg.route("/message", methods=["GET", "POST"])
 @login_required
 def send_message():  # noqa: E501
     """Render message page
@@ -224,9 +224,9 @@ def delete_message_lottery_points(message_id):  # noqa: E501
         return jsonify({"message_id": -1})
 
 
-@msg.route("/message/sent/<day>/<month>/<year>", methods=["GET"])
+@msg.route("/api/calendar/<int:day>/<int:month>/<int:year>", methods=["GET"])
 @login_required
-def get_daily_messages(day, month, year):  # noqa: E501
+def get_daily_messages(day: int, month: int, year: int):  # noqa: E501
     """Gets all messages scheduled for a day
      # noqa: E501
     :param day: day
@@ -235,7 +235,7 @@ def get_daily_messages(day, month, year):  # noqa: E501
     :type month: int
     :param year: year
     :type year: int
-    :rtype: List[InlineResponse2003]
+    :rtype: List[messages]
     """
 
     if day > 31 or month + 1 > 12:
@@ -244,6 +244,8 @@ def get_daily_messages(day, month, year):  # noqa: E501
         response = MessageManager.get_day_message(year, month, day, current_user.id)
         if response.status_code == 200:
             return response.json()
+        elif response.status_code == 404:
+            return jsonify(dict())
         else:
             return abort(500)
 

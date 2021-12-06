@@ -16,7 +16,7 @@ class MessageManager:
                 cls.MESSAGE_ENDPOINT + "/" + str(message_id),
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
-            return response.json()
+            return response
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
@@ -37,7 +37,7 @@ class MessageManager:
                 + str(day),
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
-            return response.json()
+            return response
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
@@ -62,10 +62,10 @@ class MessageManager:
 
         try:
             response = requests.get(
-                cls.MESSAGE_ENDPOINT + "/message/" + str(user_id + "/sent/metadata"),
+                cls.MESSAGE_ENDPOINT + "/message/" + str(user_id) + "/sent/metadata",
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
-            return response.json()
+            return response
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
@@ -75,10 +75,10 @@ class MessageManager:
 
         try:
             response = requests.get(
-                cls.MESSAGE_ENDPOINT + "/message" + str(user_id) + "/received/metadata",
+                cls.MESSAGE_ENDPOINT + "/message/" + str(user_id) + "/received/metadata",
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
-            return response.json()
+            return response
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
