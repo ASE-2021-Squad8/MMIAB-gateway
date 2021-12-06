@@ -64,7 +64,7 @@ function open_message_received(msg_id) {
 
     // Get the message contents
     $.ajax({
-        url: '/api/message/received/' + msg_id,
+        url: '/message/' + msg_id,
         type: 'GET',
         dataType: 'json',
         success: function (message) {
@@ -111,7 +111,7 @@ function open_message_sent(msg_id) {
 
     // Get the message contents
     $.ajax({
-        url: '/api/message/sent/' + msg_id,
+        url: '/message/' + msg_id,
         type: 'GET',
         dataType: 'json',
         success: function (message) {
@@ -186,7 +186,7 @@ function forward_message(msg_email, msg_id, forwarding_sent = false) {
 
     // Get the message contents
     $.ajax({
-        url: '/api/message/' + (forwarding_sent ? 'sent/' : 'received/') + msg_id,
+        url: '/message/' + msg_id,
         type: 'GET',
         dataType: 'json',
         success: function (message) {

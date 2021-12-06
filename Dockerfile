@@ -1,10 +1,10 @@
 #
-# Docker file for MessageInABottle S<ID> v1.0
+# Docker file for MessageInABottle S<8> v1.0
 #
 FROM python:3.9
-LABEL maintainer="MessageInABottle Squad <ID> API Gateway"
+LABEL maintainer="MessageInABottle Squad <8> API Gateway"
 LABEL version="1.0"
-LABEL description="MessageInABottle Application Squad <ID>"
+LABEL description="MessageInABottle Application Squad <8>"
 
 # creating the environment
 COPY . /app

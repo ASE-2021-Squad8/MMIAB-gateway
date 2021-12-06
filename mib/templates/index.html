@@ -8,7 +8,7 @@
 You're now logged in as <b>{{ current_user.firstname }} {{ current_user.lastname }}</b> ({{current_user.email}})<br><br>
 <a href="{{url_for('users.search_user')}}">Search a user</a><br>
 <a href="{{url_for('message.mailbox')}}">Mailbox</a><br>
-<a href="{{url_for('message.send_message_page')}}">Send or draft a message</a><br>
+<a href="{{url_for('message.send_message')}}">Send or draft a message</a><br>
 <a href="{{url_for('message.get_calendar')}}">Calendar of outgoing messages</a>
 <hr>
 <a href="{{url_for('home.settings')}}">Settings</a><br>

@@ -59,7 +59,7 @@ paths:
       summary: Render profile template of current user
       responses:
         200:
-          description: Renders the customer_profile template, filled with the ssn form and the user's reservations
+          description: Renders the account_data template, filled with the ssn form and the user's reservations
         302:
           description: Redirects to the homepage, in case the user accessing the profile is not its owner
     post:
@@ -94,7 +94,7 @@ paths:
                 - password
       responses:
         200:
-          description: Renders the update_customer template, to allow the customer to modify its data
+          description: Renders the edit_profile template, to allow the customer to modify its data
         302:
           description: Redirects to the customer profile page
   
@@ -535,7 +535,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  attachement:
+                  attachment:
                     type: string
                     format: binary
           description: The attachment
@@ -629,17 +629,54 @@ paths:
       responses:
         200:
           description: Message deleted
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: 3
+                    format: int64
         400:
           description: Message already sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: -1
+                    format: int64
         401:
           description: Not enough points
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: -1
+                    format: int64
         404:
           description: Message not found
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: -1
+                    format: int64
+
   /message/bin/{message_id}:
     delete:
       tags:
         [Message]
-      summary: Delete a received message message
+      summary: Delete a received message 
       operationId: delete_received_message
       parameters:
         - name: message_id

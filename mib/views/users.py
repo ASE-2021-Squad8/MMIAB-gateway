@@ -222,6 +222,7 @@ def unregister():  # noqa: E501
 
 
 @users.route("/user", methods=["GET"])
+@login_required
 def user_profile():  # noqa: E501
     """Render profile template of current user
      # noqa: E501

@@ -132,11 +132,11 @@
 <script src="{{ url_for('static', filename='mailbox.js') }}"></script>
 <script>
 	function refreshTables() {
-		$.get("{{url_for('message._get_received_messages_metadata')}}", function (data) { buildTableReceived(data); });
-		$.get("{{url_for('message._get_sent_messages_metadata')}}", function (data) { buildTableSent(data) });
+		$.get("{{url_for('message.get_all_received_messages_metadata')}}", function (data) { buildTableReceived(data); });
+		$.get("{{url_for('message.get_all_sent_messages_metadata')}}", function (data) { buildTableSent(data) });
 	}
 
 	refreshTables();
-	setInterval(refreshTables, 10 * 1000);
+	setInterval(refreshTables, 30 * 1000);
 </script>
 {% endblock %}

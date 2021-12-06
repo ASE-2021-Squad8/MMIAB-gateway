@@ -22,7 +22,7 @@ function get_recipient() {
 
 $(document).ready(function () {
     get_recipient();
-    $.get('/api/message/draft/all', buildTable)
+    $.get('/message/draft', buildTable)
 });
 
 function buildTable(data) {

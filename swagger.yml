@@ -65,7 +65,7 @@ paths:
           type: integer
       responses:
         200:
-          description: Renders the customer_profile template, filled with the ssn form and the user's reservations
+          description: Renders the account_data template, filled with the ssn form and the user's reservations
         302:
           description: Redirects to the homepage, in case the user accessing the profile is not its owner
     
@@ -99,7 +99,7 @@ paths:
                 - password
       responses:
         200:
-          description: Renders the update_customer template, to allow the customer to modify its data
+          description: Renders the edit_profile template, to allow the customer to modify its data
         302:
           description: Redirects to the customer profile page
   /logout:

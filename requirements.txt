@@ -1,5 +1,6 @@
 Flask==1.1.2
 Flask-Bootstrap==3.3.7.1
+Flask-CKEditor==0.4.6
 Flask-Datepicker==0.14
 Flask-Environments==0.1
 Flask-Session==0.3.2
