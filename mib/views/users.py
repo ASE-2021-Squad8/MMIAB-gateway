@@ -312,3 +312,12 @@ def get_user_public(id):
         return json.dumps(response.json())
     else:
         return abort(500)
+
+
+@users.route("/api/user/<id>", methods=["GET"])
+def get_user(id):
+    response = UserManager.get_user_by_id_json(id)
+    if response.status_code == 200:
+        return json.dumps(response.json())
+    else:
+        return abort(500)

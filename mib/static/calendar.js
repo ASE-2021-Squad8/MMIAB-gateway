@@ -30,7 +30,7 @@ function write_message(data, day, month, year) {
       current_msg = data[i];
       recipient = "";
       $.ajax({
-          url: '/api/user/' + current_msg.recipient + "/public",
+          url: '/api/user/' + current_msg.recipient,
           type: 'GET',
           async: false,
           dataType: 'json',
@@ -38,7 +38,7 @@ function write_message(data, day, month, year) {
       });
       sender = "";
       $.ajax({
-          url: '/api/user/' + current_msg.sender + "/public",
+          url: '/api/user/' + current_msg.sender,
           type: 'GET',
           async: false,
           dataType: 'json',
