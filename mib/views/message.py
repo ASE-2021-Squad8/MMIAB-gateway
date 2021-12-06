@@ -241,7 +241,7 @@ def get_daily_messages(day: int, month: int, year: int):  # noqa: E501
     :rtype: List[messages]
     """
 
-    if day > 31 or month + 1 > 12:
+    if day > 31 or month > 12:
         return _get_result(None, ERROR_PAGE, True, 404, "Invalid date")
     else:
         response = MessageManager.get_day_message(year, month, day, current_user.id)

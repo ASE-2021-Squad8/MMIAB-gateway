@@ -1,6 +1,12 @@
 function get_day_message(day, month, year) {
   console.log(month);
-  $.get('/api/calendar/' + day + "/" + month + "/" + year, function (data) { write_message(data, day, month, year); });
+  $.ajax({
+    url: '/api/calendar/' + day + "/" + month + "/" + year,
+    type: 'GET',
+    async: false,
+    dataType: 'json',
+    success: function (data) { write_message(data, day, month, year); },
+  });
 }
 
 function write_message(data, day, month, year) {
@@ -25,7 +31,7 @@ function write_message(data, day, month, year) {
       var text = current_msg.future ? "Will be sent at" : "Sent at";
       display_html += `
               <h4> ${text} ${current_msg.delivered}</h4>
-              <h5>Recipient: ${current_msg.email}</h5><br>
+              <h5>Recipient: ${user.email}</h5><br>
               ${current_msg.text}<br><hr>
               `;
       if (current_msg.candelete) {
