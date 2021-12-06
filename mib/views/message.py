@@ -74,7 +74,7 @@ def get_all_received_messages_metadata():  # noqa: E501
     if response.status_code == 200:
         return jsonify(response.json())
     else:
-        return abort(500, "An error occured during retrieving the metadata")
+        return abort(response.status_code, "An error occured while retrieving the metadata")
 
 
 @msg.route("/sent/metadata", methods=["GET"])
@@ -89,7 +89,7 @@ def get_all_sent_messages_metadata():  # noqa: E501
     if response.status_code == 200:
         return jsonify(response.json())
     else:
-        return abort(500, "An error occured during retrieving the metadata")
+        return abort(response.status_code, "An error occured while retrieving the metadata")
 
 
 @msg.route("/calendar", methods=["GET"])
