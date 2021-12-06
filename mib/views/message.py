@@ -39,9 +39,9 @@ def attachment_get(message_id):  # noqa: E501
 
     if response.status_code == 200:
         json_obj = response.get_json()
-        data_response = {"attachement": json_obj["media"]}
+        data_response = {"attachment": json_obj["media"]}
         return jsonify(data_response)
-    elif response.status_code == 404:
+    else:
         return abort(500)
 
 
@@ -59,10 +59,8 @@ def delete_received_message(message_id):  # noqa: E501
     response = MessageManager.set_message_is_delete(message_id, user_id)
     if response.status_code == 200:
         return jsonify({"message_id": message_id})
-    elif response.status_code == 400:
-        return _get_result(None, ERROR_PAGE, True, 404, "Wrong message id")
-    elif response.status_code == 404:
-        return _get_result(None, ERROR_PAGE, True, 404, "User not found")
+    else:
+        return abort(500)
 
 
 @msg.route("/message/received/metadata")
@@ -75,8 +73,8 @@ def get_all_received_messages_metadata():  # noqa: E501
     response = MessageManager.get_received_messages_metadata(user_id)
     if response.status_code == 200:
         return jsonify(response)
-    if response.status_code == 404:
-        return abort("An error occured during retrieving the metadata")
+    else:
+        return abort(500, "An error occured during retrieving the metadata")
 
 
 @msg.route("/sent/metadata", methods=["GET"])
@@ -90,8 +88,8 @@ def get_all_sent_messages_metadata():  # noqa: E501
     response = MessageManager.get_sent_messages_metadata(user_id)
     if response.status_code == 200:
         return jsonify(response)
-    if response.status_code == 404:
-        return abort("An error occured during retrieving the metadata")
+    else:
+        return abort(500, "An error occured during retrieving the metadata")
 
 
 @msg.route("/calendar", methods=["GET"])
@@ -116,12 +114,10 @@ def get_message(message_id):  # noqa: E501
     :rtype: Message
     """
     response = MessageManager.get_message(message_id)
-    if response.status_code==200:
+    if response.status_code == 200:
         return jsonify(response)
-    elif response.status_code==404:
-        return  _get_result(
-                None, "/message", True, 404, "Message not Found"
-            )
+    else:
+        return abort(500)
 
 
 @msg.route("/message/mailbox", methods=["GET"])
@@ -221,14 +217,14 @@ def delete_message_lottery_points(message_id):  # noqa: E501
     :rtype: None
     """
     response = MessageManager.delete_message_lottery_points(message_id)
-    status_code = response.status_code
-    if status_code == 200:
+    if response.status_code == 200:
         return jsonify({"message_id": message_id})
-    elif status_code == 400 or status_code == 401 or status_code == 404:
+    else:
+        #error 400, 401, 404
         return jsonify({"message_id": -1})
 
 
-@msg.route("/message/sent/<day>/<month>/<year>", methods=['GET'])
+@msg.route("/message/sent/<day>/<month>/<year>", methods=["GET"])
 @login_required
 def get_daily_messages(day, month, year):  # noqa: E501
     """Gets all messages scheduled for a day
@@ -245,14 +241,11 @@ def get_daily_messages(day, month, year):  # noqa: E501
     if day > 31 or month + 1 > 12:
         return _get_result(None, ERROR_PAGE, True, 404, "Invalid date")
     else:
-        user_id = current_user.id
-        response = MessageManager.get_day_message(year, month, day, user_id)
+        response = MessageManager.get_day_message(year, month, day, current_user.id)
         if response.status_code == 200:
             return response.json()
-        elif response.status_code==404:
-            return  _get_result(
-                None, "/message/sent", True, 400, "User id not found"
-            ) 
+        else:
+            return abort(500)
 
 
 @msg.route("/message/draft", methods=["GET"])
@@ -299,6 +292,7 @@ def save_draft():
         response = MessageManager.update_draft(draft_id, json.dumps(draft))
     else:
         response = MessageManager.save_new_draft(json.dumps(draft))
+
     if response.status_code == 200:
         return _get_result(jsonify({"message_id": draft_id}), "message.send_message")
     else:
