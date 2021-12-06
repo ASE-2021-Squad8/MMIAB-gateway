@@ -285,7 +285,7 @@ function send_msg_reply_forward(form_id, forwarding = false) {
     }
 
     $.ajax({
-        url: "/api/message/",
+        url: "/api/message",
         data: request_data,
         contentType: false,
         processData: false,
