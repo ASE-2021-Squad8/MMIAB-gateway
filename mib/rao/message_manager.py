@@ -13,7 +13,7 @@ class MessageManager:
 
         try:
             response = requests.get(
-                cls.MESSAGE_ENDPOINT + "/" + str(message_id),
+                cls.MESSAGE_ENDPOINT + "/message/" + str(message_id),
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )
             return response
