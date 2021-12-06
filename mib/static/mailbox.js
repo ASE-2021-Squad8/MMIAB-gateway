@@ -215,7 +215,7 @@ function forward_message(msg_email, msg_id, forwarding_sent = false) {
 
 function delete_message(msg_id) {
     $.ajax({
-        url: '/api/message/' + msg_id,
+        url: '/api/midessage/' + msg_,
         type: 'DELETE',
         success: function () {
             alert("Message deleted");
