@@ -19,23 +19,19 @@ class UserManager:
         :param user_id: the user id
         :return: User obj with id=user_id
         """
-        try:
-            response = requests.get(
-                cls.USERS_ENDPOINT + "/user/" + str(user_id),
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        response = requests.get(
+            cls.USERS_ENDPOINT + "/user/" + str(user_id),
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        json_payload = response.json()
+        if response.status_code == 200:
+            # user is authenticated
+            return User.build_from_json(json_payload)
+        else:
+            raise RuntimeError(
+                "Server has sent an unrecognized status code %s"
+                % response.status_code
             )
-            json_payload = response.json()
-            if response.status_code == 200:
-                # user is authenticated
-                return User.build_from_json(json_payload)
-            else:
-                raise RuntimeError(
-                    "Server has sent an unrecognized status code %s"
-                    % response.status_code
-                )
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
 
     @classmethod
     @circuit
@@ -47,22 +43,17 @@ class UserManager:
         lastname: str,
         dateofbirth,
     ):
-        try:
-            response = requests.post(
-                cls.USERS_ENDPOINT + "/user",
-                json={
-                    "email": email,
-                    "password": password,
-                    "firstname": firstname,
-                    "lastname": lastname,
-                    "dateofbirth": dateofbirth,
-                },
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
+        response = requests.post(
+            cls.USERS_ENDPOINT + "/user",
+            json={
+                "email": email,
+                "password": password,
+                "firstname": firstname,
+                "lastname": lastname,
+                "dateofbirth": dateofbirth,
+            },
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
         return response
 
     @classmethod
@@ -78,17 +69,13 @@ class UserManager:
             password: the user password
         :return: User updated
         """
-        try:
-            url = cls.USERS_ENDPOINT + "/user/" + str(user_id)
-            response = requests.put(
-                url,
-                json={"email": email, "password": password},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        url = cls.USERS_ENDPOINT + "/user/" + str(user_id)
+        response = requests.put(
+            url,
+            json={"email": email, "password": password},
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @circuit
     @classmethod
@@ -99,14 +86,9 @@ class UserManager:
         :param user_id: the user id
         :return: User updated
         """
-        try:
-            logout_user()
-            url = cls.USERS_ENDPOINT + "/user/" + str(user_id)
-            response = requests.delete(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
+        logout_user()
+        url = cls.USERS_ENDPOINT + "/user/" + str(user_id)
+        response = requests.delete(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
         return response
 
     @classmethod
@@ -119,16 +101,12 @@ class UserManager:
         :return: None if credentials are not correct, User instance if credentials are correct.
         """
         payload = dict(email=email, password=password)
-        try:
-            response = requests.post(
-                cls.USERS_ENDPOINT + "/authenticate",
-                json=payload,
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            json_response = response.json()
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.post(
+            cls.USERS_ENDPOINT + "/authenticate",
+            json=payload,
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        json_response = response.json()
 
         if response.status_code == 400:
             # user is not authenticated
@@ -147,20 +125,16 @@ class UserManager:
         :param newpw: new password chosen by the user
         :param confpw: confirmation password, used to verify that the user has entered the currpw correctly
         """
-        try:
-            response = requests.put(
-                cls.USERS_ENDPOINT + "/user/password/" + str(user_id),
-                json={
-                    "currentpassword": currpw,
-                    "newpassword": newpw,
-                    "confirmpassword": confpw,
-                },
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.put(
+            cls.USERS_ENDPOINT + "/user/password/" + str(user_id),
+            json={
+                "currentpassword": currpw,
+                "newpassword": newpw,
+                "confirmpassword": confpw,
+            },
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
@@ -171,15 +145,12 @@ class UserManager:
         :param filter: 0 = disable, 1 = enable
         :return: response
         """
-        try:
-            response = requests.put(
-                cls.USERS_ENDPOINT + "/user/content_filter/" + str(id),
-                json={"filter": filter},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.put(
+            cls.USERS_ENDPOINT + "/user/content_filter/" + str(id),
+            json={"filter": filter},
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
@@ -188,27 +159,20 @@ class UserManager:
 
         :param user_id: id associated with the user who wants to unsubscribe
         """
-
-        try:
-            response = requests.delete(
-                cls.USERS_ENDPOINT + "/user/" + str(user_id),
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.delete(
+            cls.USERS_ENDPOINT + "/user/" + str(user_id),
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def get_users_list_public(cls):
-        try:
-            response = requests.get(
-                cls.USERS_ENDPOINT + "/user/list/public",
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.get(
+            cls.USERS_ENDPOINT + "/user/list/public",
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
@@ -217,15 +181,12 @@ class UserManager:
 
         :param email: the email of the reported user
         """
-        try:
-            response = requests.put(
-                cls.USERS_ENDPOINT + "/user/report",
-                json={"useremail": email},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.put(
+            cls.USERS_ENDPOINT + "/user/report",
+            json={"useremail": email},
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
@@ -239,106 +200,82 @@ class UserManager:
         :param lastname: new user's lastname
         :param dateofbirth: new date of birth of the user
         """
-        try:
-            response = requests.put(
-                cls.USERS_ENDPOINT + "/user/data/" + str(user_id),
-                json={
-                    "textemail": email,
-                    "textfirstname": firstname,
-                    "textlastname": lastname,
-                    "textbirth": dateofbirth,
-                },
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.put(
+            cls.USERS_ENDPOINT + "/user/data/" + str(user_id),
+            json={
+                "textemail": email,
+                "textfirstname": firstname,
+                "textlastname": lastname,
+                "textbirth": dateofbirth,
+            },
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def get_blacklist(cls, user_id: int):
         """Get blacklisted users for user_id"""
-        try:
-            response = requests.get(
-                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.get(
+            cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def add_to_blacklist(cls, user_id, userlist_to_add):
         """Add list of users to blacklist of user_id"""
-        try:
-            response = requests.put(
-                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
-                json={"op": "add", "users": userlist_to_add},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.put(
+            cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
+            json={"op": "add", "users": userlist_to_add},
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def remove_from_blacklist(cls, user_id, userlist_to_remove):
         """Remove list of users from blacklist of user_id"""
-        try:
-            response = requests.put(
-                cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
-                json={"op": "delete", "users": userlist_to_remove},
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.put(
+            cls.USERS_ENDPOINT + "/user/black_list/" + str(user_id),
+            json={"op": "delete", "users": userlist_to_remove},
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def get_user_email(cls, user_id: int):
-        try:
-            response = requests.get(
-                cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/email",
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.get(
+            cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/email",
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def get_recipients(cls, user_id: int):
-        try:
-            response = requests.get(
-                cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/recipients",
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.get(
+            cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/recipients",
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def get_user_public(cls, user_id: int):
-        try:
-            response = requests.get(
-                cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/public",
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.get(
+            cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/public",
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
 
     @classmethod
     @circuit
     def get_user_by_id_json(cls, user_id: int):
-        try:
-            response = requests.get(
-                cls.USERS_ENDPOINT + "/user/" + str(user_id),
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+        response = requests.get(
+            cls.USERS_ENDPOINT + "/user/" + str(user_id),
+            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+        )
+        return response
