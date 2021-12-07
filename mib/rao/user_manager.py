@@ -10,8 +10,8 @@ class UserManager:
     USERS_ENDPOINT = app.config["USERS_MS_URL"]
     REQUESTS_TIMEOUT_SECONDS = app.config["REQUESTS_TIMEOUT_SECONDS"]
 
-    @circuit
     @classmethod
+    @circuit
     def get_user_by_id(cls, user_id: int) -> User:
         """
         This method contacts the users microservice
@@ -37,8 +37,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def create_user(
         cls,
         email: str,
@@ -65,8 +65,8 @@ class UserManager:
 
         return response
 
-    @circuit
     @classmethod
+    @circuit
     def update_user(cls, user_id: int, email: str, password: str):
         """
         This method contacts the users microservice
@@ -109,8 +109,8 @@ class UserManager:
 
         return response
 
-    @circuit
     @classmethod
+    @circuit
     def authenticate_user(cls, email: str, password: str) -> User:
         """
         This method authenticates the user trough users AP
@@ -138,8 +138,8 @@ class UserManager:
             user.authenticate()
             return user
 
-    @circuit
     @classmethod
+    @circuit
     def change_password(cls, user_id: int, currpw: str, newpw: str, confpw: str):
         """Call users microservice to change the password for a user
         :param user_id: id of the user who wants to change the password
@@ -162,8 +162,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def set_content_filter(cls, id: int, filter: str):
         """Call users microservice to change the content filter for a user
 
@@ -181,8 +181,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def user_unregister(cls, user_id: int):
         """Call calls the users microservice in order to unsubscribe a user
 
@@ -198,8 +198,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_users_list_public(cls):
         try:
             response = requests.get(
@@ -210,8 +210,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def report(cls, email: str):
         """Report the user with an email
 
@@ -227,8 +227,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def change_data_user(cls, user_id, email, firstname, lastname, dateofbirth):
         """Interacts with the microservice of the users in order to change the data of an
         already registered user
@@ -254,8 +254,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_blacklist(cls, user_id: int):
         """Get blacklisted users for user_id"""
         try:
@@ -267,8 +267,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def add_to_blacklist(cls, user_id, userlist_to_add):
         """Add list of users to blacklist of user_id"""
         try:
@@ -281,8 +281,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def remove_from_blacklist(cls, user_id, userlist_to_remove):
         """Remove list of users from blacklist of user_id"""
         try:
@@ -295,8 +295,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_user_email(cls, user_id: int):
         try:
             response = requests.get(
@@ -307,8 +307,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_recipients(cls, user_id: int):
         try:
             response = requests.get(
@@ -319,8 +319,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_user_public(cls, user_id: int):
         try:
             response = requests.get(
@@ -331,8 +331,8 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_user_by_id_json(cls, user_id: int):
         try:
             response = requests.get(

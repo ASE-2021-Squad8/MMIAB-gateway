@@ -9,8 +9,8 @@ class MessageManager:
     NOTIFICATIONS_ENDPOINT = app.config["NOTIFICATIONS_MS_URL"]
     REQUESTS_TIMEOUT_SECONDS = app.config["REQUESTS_TIMEOUT_SECONDS"]
 
-    @circuit
     @classmethod
+    @circuit
     def get_message(cls, message_id):
 
         try:
@@ -23,8 +23,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_day_message(cls, year, month, day, user_id):
         """Get all the sent messages for a specific day"""
         try:
@@ -44,8 +44,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_sent_messages_metadata(cls, user_id):
 
         try:
@@ -58,8 +58,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_received_messages_metadata(cls, user_id):
 
         try:
@@ -75,8 +75,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_attachment(cls, msg_id):
         """
         This method contacts the message microservice
@@ -92,8 +92,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def send_message(cls, msg):
         """
         Send a message via the messages microservice
@@ -108,8 +108,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def delete_message_lottery_points(cls, message_id: int):
         """
         Contact the messaging microservice in order to sort out scheduled messages
@@ -125,8 +125,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def update_message(cls, message_id: int, attribute: str, value):
         try:
             response = requests.put(
@@ -138,8 +138,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_draft(cls, draft_id: int):
         try:
             response = requests.get(
@@ -150,8 +150,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def get_all_drafts_for_user(cls, user_id: int):
         try:
             response = requests.get(
@@ -162,8 +162,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def send_notification(cls, sender: str, receiver: str):
         try:
             response = requests.put(
@@ -179,8 +179,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def save_new_draft(cls, draft):
         try:
             response = requests.post(
@@ -192,8 +192,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def update_draft(cls, draft_id: int, draft):
         try:
             response = requests.put(
@@ -205,8 +205,8 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    @circuit
     @classmethod
+    @circuit
     def delete_draft(cls, draft_id: int):
         try:
             response = requests.delete(
