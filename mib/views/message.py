@@ -9,7 +9,6 @@ from flask import (
     abort,
     jsonify,
 )
-from flask.signals import message_flashed
 from flask_login import login_required, current_user
 from mib.forms.forms import MessageForm
 from mib.rao.user_manager import UserManager
@@ -17,7 +16,6 @@ from datetime import datetime
 import os
 import json
 import base64
-from re import search
 
 from mib.rao.message_manager import MessageManager
 
@@ -46,7 +44,7 @@ def attachment_get(message_id):  # noqa: E501
         return abort(500)
 
 
-@msg.route("/message/<message_id>", methods=["DELETE"])
+@msg.route("/api/message/<message_id>", methods=["DELETE"])
 @login_required
 def delete_received_message(message_id):  # noqa: E501
     """Delete a received message
@@ -56,8 +54,7 @@ def delete_received_message(message_id):  # noqa: E501
 
     :rtype: None
     """
-    user_id = current_user.id
-    response = MessageManager.set_message_is_delete(message_id, user_id)
+    response = MessageManager.update_message(message_id, "is_deleted", True)
     if response.status_code == 200:
         return jsonify({"message_id": message_id})
     else:

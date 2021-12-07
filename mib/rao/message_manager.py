@@ -42,22 +42,6 @@ class MessageManager:
             return abort(500)
 
     @classmethod
-    def set_message_is_delete(cls, message_id, user_id):
-
-        try:
-            response = requests.get(
-                cls.MESSAGE_ENDPOINT
-                + "/message/received/"
-                + str(message_id)
-                + "/"
-                + str(user_id),
-                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-            )
-            return response
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
-    @classmethod
     def get_sent_messages_metadata(cls, user_id):
 
         try:
