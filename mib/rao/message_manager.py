@@ -1,6 +1,7 @@
 from mib import app
 from flask import abort
 import requests
+from circuitbreaker import circuit
 
 
 class MessageManager:
@@ -8,6 +9,7 @@ class MessageManager:
     NOTIFICATIONS_ENDPOINT = app.config["NOTIFICATIONS_MS_URL"]
     REQUESTS_TIMEOUT_SECONDS = app.config["REQUESTS_TIMEOUT_SECONDS"]
 
+    @circuit
     @classmethod
     def get_message(cls, message_id):
 
@@ -21,6 +23,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_day_message(cls, year, month, day, user_id):
         """Get all the sent messages for a specific day"""
@@ -41,6 +44,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_sent_messages_metadata(cls, user_id):
 
@@ -54,6 +58,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_received_messages_metadata(cls, user_id):
 
@@ -70,6 +75,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_attachment(cls, msg_id):
         """
@@ -86,6 +92,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def send_message(cls, msg):
         """
@@ -101,6 +108,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def delete_message_lottery_points(cls, message_id: int):
         """
@@ -117,6 +125,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def update_message(cls, message_id: int, attribute: str, value):
         try:
@@ -129,6 +138,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_draft(cls, draft_id: int):
         try:
@@ -140,6 +150,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_all_drafts_for_user(cls, user_id: int):
         try:
@@ -151,6 +162,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def send_notification(cls, sender: str, receiver: str):
         try:
@@ -167,6 +179,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def save_new_draft(cls, draft):
         try:
@@ -179,6 +192,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def update_draft(cls, draft_id: int, draft):
         try:
@@ -191,6 +205,7 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def delete_draft(cls, draft_id: int):
         try:

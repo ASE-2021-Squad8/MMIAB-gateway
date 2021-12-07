@@ -2,6 +2,7 @@ from mib.auth.user import User
 from mib import app
 from flask_login import logout_user
 from flask import abort
+from circuitbreaker import circuit
 import requests
 
 
@@ -9,6 +10,7 @@ class UserManager:
     USERS_ENDPOINT = app.config["USERS_MS_URL"]
     REQUESTS_TIMEOUT_SECONDS = app.config["REQUESTS_TIMEOUT_SECONDS"]
 
+    @circuit
     @classmethod
     def get_user_by_id(cls, user_id: int) -> User:
         """
@@ -35,32 +37,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-    # @classmethod
-    # def get_user_by_email(cls, user_email: str):
-    #     """
-    #     This method contacts the users microservice
-    #     and retrieves the user object by user email.
-    #     :param user_email: the user email
-    #     :return: User obj with email=user_email
-    #     """
-    #     try:
-    #         response = requests.get(
-    #             cls.USERS_ENDPOINT + "/user_email/" + user_email,
-    #             timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-    #         )
-    #         json_payload = response.json()
-    #         user = None
-
-    #         if response.status_code == 200:
-    #             user = User.build_from_json(json_payload)
-    #         else response.status_code == 404:
-    #             return {"message": }
-
-    #     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-    #         return abort(500)
-
-    #     return user
-
+    @circuit
     @classmethod
     def create_user(
         cls,
@@ -88,6 +65,7 @@ class UserManager:
 
         return response
 
+    @circuit
     @classmethod
     def update_user(cls, user_id: int, email: str, password: str):
         """
@@ -112,6 +90,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def delete_user(cls, user_id: int):
         """
@@ -130,6 +109,7 @@ class UserManager:
 
         return response
 
+    @circuit
     @classmethod
     def authenticate_user(cls, email: str, password: str) -> User:
         """
@@ -158,6 +138,7 @@ class UserManager:
             user.authenticate()
             return user
 
+    @circuit
     @classmethod
     def change_password(cls, user_id: int, currpw: str, newpw: str, confpw: str):
         """Call users microservice to change the password for a user
@@ -181,6 +162,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def set_content_filter(cls, id: int, filter: str):
         """Call users microservice to change the content filter for a user
@@ -199,6 +181,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def user_unregister(cls, user_id: int):
         """Call calls the users microservice in order to unsubscribe a user
@@ -215,6 +198,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_users_list_public(cls):
         try:
@@ -226,6 +210,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def report(cls, email: str):
         """Report the user with an email
@@ -242,6 +227,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def change_data_user(cls, user_id, email, firstname, lastname, dateofbirth):
         """Interacts with the microservice of the users in order to change the data of an
@@ -268,6 +254,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_blacklist(cls, user_id: int):
         """Get blacklisted users for user_id"""
@@ -280,6 +267,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def add_to_blacklist(cls, user_id, userlist_to_add):
         """Add list of users to blacklist of user_id"""
@@ -293,6 +281,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def remove_from_blacklist(cls, user_id, userlist_to_remove):
         """Remove list of users from blacklist of user_id"""
@@ -306,6 +295,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_user_email(cls, user_id: int):
         try:
@@ -317,6 +307,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_recipients(cls, user_id: int):
         try:
@@ -328,6 +319,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_user_public(cls, user_id: int):
         try:
@@ -339,6 +331,7 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
+    @circuit
     @classmethod
     def get_user_by_id_json(cls, user_id: int):
         try:
