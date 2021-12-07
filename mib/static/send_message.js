@@ -1,3 +1,36 @@
+const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+
+    const blob = new Blob(byteArrays, { type: contentType });
+    return blob;
+}
+
+function getAttachment(msg_id) {
+    $.ajax({
+        url: `/message/${msg_id}/attachment`,
+        type: 'GET',
+        success: function (data) {
+            const blob = b64toBlob(data, "image/jpeg");
+            const blobUrl = URL.createObjectURL(blob);
+
+            window.location = blobUrl;
+        },
+    });
+}
+
 function get_recipient() {
     $.ajax({
         url: "/api/user/recipients",
@@ -23,16 +56,16 @@ function get_recipient() {
 $(document).ready(function () {
     get_recipient();
     $.ajax({
-		url: '/message/draft',
-		type: 'GET',
-		dataType: 'json',
-		success: buildTable
-	})
+        url: '/message/draft',
+        type: 'GET',
+        dataType: 'json',
+        success: buildTable
+    })
 });
 
 function buildTable(data) {
     var table = document.getElementById('draftsTable')
-	
+
     if (data.length == 0) {
         table.innerHTML = "No drafts!"
         return
@@ -48,8 +81,8 @@ function buildTable(data) {
     </thead>`
 
     for (var i = 0; i < data.length; i++) {
-		msg = ""
-		$.ajax({
+        msg = ""
+        $.ajax({
             url: '/api/message/draft/' + data[i].id,
             type: 'GET',
             async: false,
@@ -66,15 +99,13 @@ function buildTable(data) {
         })
 
         if (data[i].has_media) {
-            msg.text += `<a class="btn btn-secondary" href="${MEDIA_URL}">View attachment</a>`.replace("MEDIA", msg.media)
+            msg.text += `<a class="btn btn-secondary" href="#" onclick="getAttachment(${msg_id})">View attachment</a>`
         }
 
         var row = `<tr>`
-        
-        if(msg.recipient) {
-            row += 
-            `<td>${user.firstname + " " + user.lastname}</td>
-                        <td>${user.email}</td>`
+
+        if (msg.recipient) {
+            row += `<td>${user.firstname + " " + user.lastname}</td><td>${user.email}</td>`
         } else {
             row += `<td>None</td><td>None</td>`
         }

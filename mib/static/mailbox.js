@@ -1,3 +1,35 @@
+const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+
+    const blob = new Blob(byteArrays, { type: contentType });
+    return blob;
+}
+
+function getAttachment(msg_id) {
+    $.ajax({
+        url: `/message/${msg_id}/attachment`,
+        type: 'GET',
+        success: function (data) {
+            const blob = b64toBlob(data, "image/jpeg");
+            const blobUrl = URL.createObjectURL(blob);
+
+            window.location = blobUrl;
+        },
+    });
+}
 
 function buildTableReceived(data) {
     var table = document.getElementById('received');
@@ -11,7 +43,7 @@ function buildTableReceived(data) {
         <th class="text-center" scope="col">Delete message for me</th>
     </tr>
 </thead>`
-    
+
     for (var i = 0; i < data.length; i++) {
         msg = JSON.parse(data[i]);
         user = "";
@@ -93,15 +125,13 @@ function open_message_received(msg_id) {
             modal.style.display = "block";
             modal_text.innerHTML = message.text;
 
-            if (message.media) {
-                modal_text.innerHTML += `<a class="btn btn-secondary" href="${MEDIA_URL}">View attachment</a>`.replace("MEDIA", msg.media)
+            if (message.has_media) {
+                modal_text.innerHTML += `<a class="btn btn-secondary" href="#" onclick="getAttachment(${msg_id})">View attachment</a>`
             }
         },
         error: function () {
             var modal = document.getElementById("modal_read");
             var modal_text = document.getElementById("modal_read_text");
-            var btn = document.getElementById("myBtn");
-            var span = document.getElementsByClassName("close")[0];
             modal.style.display = "block";
             modal_text.innerHTML = "<b>Something went wrong :(</b>";
         }
@@ -140,8 +170,8 @@ function open_message_sent(msg_id) {
             modal.style.display = "block";
             modal_text.innerHTML = message.text;
 
-            if (message.media) {
-                modal_text.innerHTML += `<a class="btn btn-secondary" href="${MEDIA_URL}">View attachment</a>`.replace("MEDIA", msg.media)
+            if (message.has_media) {
+                modal_text.innerHTML += `<a class="btn btn-secondary" href="#" onclick="getAttachment(${msg_id})">View attachment</a>`
             }
         },
         error: function () {
