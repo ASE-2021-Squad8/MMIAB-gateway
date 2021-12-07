@@ -25,6 +25,7 @@ function write_message(data, day, month, year) {
     var display_html = `<h3>Your daily messages</h3><hr>`
     for (var i = 0; i < data.length; i++) {
       current_msg = data[i];
+	  console.log(current_msg);
       recipient = "";
       $.ajax({
           url: '/api/user/' + current_msg.recipient,
@@ -49,7 +50,7 @@ function write_message(data, day, month, year) {
               ${current_msg.text}<br><hr>
               `;
       if (!current_msg.is_delivered && sender.points >= 60) {
-        display_html += `<div><button type="button" class="btn btn-danger" onclick="delete_and_reload(${current_msg.id},${day}, ${month}, ${year})">Withdraw</button></div></br>`;
+        display_html += `<div><button type="button" class="btn btn-danger" onclick="delete_and_reload(${current_msg.message_id},${day}, ${month}, ${year})">Withdraw</button></div></br>`;
       }
     }
     modal_text.innerHTML += display_html;
