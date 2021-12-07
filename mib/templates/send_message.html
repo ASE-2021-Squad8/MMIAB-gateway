@@ -3,14 +3,13 @@
 
 {% block content %}
 <h1>Send a message</h1>
-<a href="/" class="btn btn-outline-primary">Homepage</a><br><br>
 <h3>Drafted messages</h3>
 
 <!-- This gets filled by JS -->
 <table class="table table-light" id="draftsTable">
 </table>
 
-<h2>Compose message</h2>
+<h3>Compose message</h3>
 <p style="color:red">{{message}}</p>
 <form method="POST" enctype="multipart/form-data">
 	{{ form.hidden_tag() }}

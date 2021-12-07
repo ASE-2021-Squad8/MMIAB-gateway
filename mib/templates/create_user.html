@@ -2,8 +2,7 @@
 {% block title %}Index{% endblock %}
 
 {% block content %}
-<h1>Create a new user</h1>
-<a href="/" class="btn btn-outline-primary">Homepage</a><br><br>
+<h1>Register</h1>
 <p style="color:red">{{error}}</p>
 <form action="" method="POST">
 	{{ form.hidden_tag() }}
@@ -17,7 +16,6 @@
 		{% endfor %}
 		{% endif %}
 		{% endfor %}
-	</dl>
-	<p><input type=submit value="Submit"></p>
+	</dl><input type=submit value="Submit" class="btn btn-dark">
 </form>
 {% endblock %}
