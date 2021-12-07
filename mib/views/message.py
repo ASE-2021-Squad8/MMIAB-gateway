@@ -316,6 +316,8 @@ def read_msg(id):
             response = MessageManager.update_message(id, "is_read", True)
             if response.status_code == 200:
                 response = UserManager.get_user_email(msg["sender"])
+                sender = None
+                receiver = None
                 if response.status_code == 200:
                     sender = response.json()["email"]
                 response = UserManager.get_user_email(msg["recipient"])

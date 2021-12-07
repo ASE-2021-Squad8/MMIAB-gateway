@@ -171,11 +171,11 @@ class MessageManager:
     def send_notification(cls, sender: str, receiver: str):
         try:
             response = requests.put(
-                cls.NOTIFICATIONS_ENDPOINT + "/mail",
+                cls.NOTIFICATIONS_ENDPOINT + "/email",
                 json={
-                    "sender": sender,
-                    "receiver": receiver,
-                    "body": "You have just received a new message from " + sender,
+                    "sender": "noreply@mmiab.com",
+                    "recipient": sender,
+                    "body": receiver + " has just read your message",
                 },
                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
             )

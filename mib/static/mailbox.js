@@ -46,7 +46,7 @@ function buildTableReceived(data) {
 </thead>`
 
     for (var i = 0; i < data.length; i++) {
-        msg = JSON.parse(data[i]);
+        msg = data[i];
         user = "";
         $.ajax({
             url: '/api/user/' + msg.recipient + "/public",
