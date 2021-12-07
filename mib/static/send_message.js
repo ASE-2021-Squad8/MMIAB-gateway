@@ -99,7 +99,7 @@ function buildTable(data) {
         })
 
         if (data[i].has_media) {
-            msg.text += `<a class="btn btn-secondary" href="#" onclick="getAttachment(${msg_id})">View attachment</a>`
+            msg.text += `<a class="btn btn-secondary" href="#" onclick="getAttachment(${data[i].id})">View attachment</a>`
         }
 
         var row = `<tr>`
