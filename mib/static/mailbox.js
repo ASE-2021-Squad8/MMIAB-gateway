@@ -49,7 +49,7 @@ function buildTableReceived(data) {
         msg = data[i];
         user = "";
         $.ajax({
-            url: '/api/user/' + msg.recipient + "/public",
+            url: '/api/user/' + msg.sender + "/public",
             type: 'GET',
             async: false,
             dataType: 'json',
@@ -264,7 +264,7 @@ function forward_message(msg_email, msg_id, forwarding_sent = false) {
 
 function delete_message(msg_id) {
     $.ajax({
-        url: '/api/midessage/' + msg_,
+        url: '/api/message/' + msg_id,
         type: 'DELETE',
         success: function () {
             alert("Message deleted");

@@ -46,7 +46,7 @@ def attachment_get(message_id):  # noqa: E501
         return abort(500)
 
 
-@msg.route("/message/bin/<message_id>", methods=["DELETE"])
+@msg.route("/message/<message_id>", methods=["DELETE"])
 @login_required
 def delete_received_message(message_id):  # noqa: E501
     """Delete a received message
@@ -324,6 +324,7 @@ def read_msg(id):
                 if response.status_code == 200:
                     receiver = response.json()["email"]
                 MessageManager.send_notification(sender, receiver)
+                return "200"
             elif response.status_code == 404:
                 return abort(
                     404, json.dumps({"msg_read": False, "error": "message not found"})
