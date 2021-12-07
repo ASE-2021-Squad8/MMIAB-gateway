@@ -1,25 +1,15 @@
-from flask import (
-    Blueprint,
-    json,
-    redirect,
-    render_template,
-    url_for,
-    request,
-    session,
-    abort,
-    jsonify,
-)
-from flask_login import login_required, current_user
-from mib.forms.forms import MessageForm
-from mib.rao.user_manager import UserManager
-from datetime import datetime, timedelta
-import os
-import json
 import base64
-import pytz
-from logging import logger
+import json
+import os
+from datetime import datetime
 
+import pytz
+from flask import (Blueprint, abort, json, jsonify, redirect, render_template,
+                   request, session, url_for)
+from flask_login import current_user, login_required
+from mib.forms.forms import MessageForm
 from mib.rao.message_manager import MessageManager
+from mib.rao.user_manager import UserManager
 
 msg = Blueprint("message", __name__)
 ERROR_PAGE = "error_page"
