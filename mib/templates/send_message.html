@@ -11,7 +11,7 @@
 
 <h3>Compose message</h3>
 <p style="color:red">{{message}}</p>
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" onsubmit="javascript:timezoneString()">
 	{{ form.hidden_tag() }}
 	<dl>
 		<dt><label>Choose recipients </label></dt>
@@ -29,6 +29,7 @@
 	</dl>
 	{{ ckeditor.load() }}
 	{{ ckeditor.config(name='text') }}
+	<input id="timezone" name="timezone" type="text" hidden>
 	<label for="delivery_date"><b>Choose a time for delivering message </b></label><br>
 	<input type="datetime-local" id="delivery_date" name="delivery_date" /><br><br><br>
 	<button type="submit" formaction="{{url_for('message.save_draft')}}" class="btn btn-primary">Save draft</button>
@@ -38,7 +39,15 @@
 
 {% block scripts %}
 <script>
-	var MEDIA_URL = `{{ url_for('static', filename='user_uploads/MEDIA') }}`
+	function timezoneString() {
+		offset = new Date().getTimezoneOffset()
+		hours = (Math.abs(offset) / 60).toString().padStart(2, "00")
+		minutes = (Math.abs(offset) % 60).toString().padStart(2, "00")
+		tz_string = offset < 0 ? `+${hours}:${minutes}` : `-${hours}:${minutes}`
+
+		dd = document.getElementById("timezone")
+		dd.value = tz_string
+	}
 </script>
 <script src="{{url_for('static', filename='send_message.js')}}"></script>
 {% endblock %}

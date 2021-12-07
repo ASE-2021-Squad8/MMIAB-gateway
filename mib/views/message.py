@@ -139,8 +139,10 @@ def send_message():  # noqa: E501
         return render_template("send_message.html", message=message, form=MessageForm())
     else:
         delivery_date = request.form["delivery_date"]
+        timezone = request.form["timezone"]
+        delivery_date_converted = datetime.strptime(delivery_date+timezone, "%Y-%m-%dT%H:%M%z")
         # check parameters
-        if delivery_date is None or datetime.strptime(delivery_date+"+01:00", "%Y-%m-%dT%H:%M%z") < datetime.now(pytz.timezone("Europe/Rome")):
+        if delivery_date is None or delivery_date_converted < datetime.now(pytz.utc):
             return _get_result(
                 None, "/send_message", True, 400, "Delivery date in the past"
             )
@@ -159,7 +161,7 @@ def send_message():  # noqa: E501
         for recipient in recipients:
             # Check if the message is a draft
             msg = dict()
-            msg["delivery_date"] = delivery_date
+            msg["delivery_date"] = delivery_date_converted.isoformat()
             msg["text"] = request.form["text"]
             msg["sender"] = int(current_user.id)
             msg["recipient"] = int(recipient)
