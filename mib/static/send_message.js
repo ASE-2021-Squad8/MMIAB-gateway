@@ -22,8 +22,9 @@ function getAttachment(msg_id) {
     $.ajax({
         url: `/message/${msg_id}/attachment`,
         type: 'GET',
+        dataType: 'json',
         success: function (data) {
-            const blob = b64toBlob(data, "image/jpeg");
+            const blob = b64toBlob(data["attachment"], "image/jpeg");
             const blobUrl = URL.createObjectURL(blob);
 
             window.location = blobUrl;
