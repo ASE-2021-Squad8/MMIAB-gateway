@@ -49,7 +49,7 @@ function write_message(data, day, month, year) {
               ${current_msg.text}<br><hr>
               `;
       if (!current_msg.is_delivered && sender.points >= 60) {
-        display_html += `<div><button type="button" class="btn btn-danger" onclick="delete_and_reload(${current_msg.message_id},${day}, ${month}, ${year})">Withdraw</button></div></br>`;
+        display_html += `<div><button type="button" class="btn btn-danger" onclick="delete_and_reload(${current_msg.id},${day}, ${month}, ${year})">Withdraw</button></div></br>`;
       }
     }
     modal_text.innerHTML += display_html;
