@@ -12,10 +12,12 @@ from flask import (
 from flask_login import login_required, current_user
 from mib.forms.forms import MessageForm
 from mib.rao.user_manager import UserManager
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import json
 import base64
+import pytz
+from logging import logger
 
 from mib.rao.message_manager import MessageManager
 
@@ -146,10 +148,9 @@ def send_message():  # noqa: E501
             session.pop("message")
         return render_template("send_message.html", message=message, form=MessageForm())
     else:
-        now = datetime.now()
         delivery_date = request.form["delivery_date"]
         # check parameters
-        if delivery_date is None or datetime.strptime(delivery_date, "%Y-%m-%dT%H:%M") < now:
+        if delivery_date is None or datetime.strptime(delivery_date+"+01:00", "%Y-%m-%dT%H:%M%z") < datetime.now(pytz.timezone("Europe/Rome")):
             return _get_result(
                 None, "/send_message", True, 400, "Delivery date in the past"
             )
@@ -159,7 +160,7 @@ def send_message():  # noqa: E501
             )
 
         recipients = request.form.getlist("recipient")
-        if recipients == [] or recipients is None:
+        if recipients is None or recipients == []:
             return _get_result(
                 None, "/send_message", True, 400, "Message needs at least one recipient"
             )
