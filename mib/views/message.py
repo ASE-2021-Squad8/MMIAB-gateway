@@ -39,7 +39,7 @@ def attachment_get(message_id):  # noqa: E501
     response = MessageManager.get_attachment(message_id)
 
     if response.status_code == 200:
-        json_obj = response.get_json()
+        json_obj = response.json()
         data_response = {"attachment": json_obj["media"]}
         return jsonify(data_response)
     else:
