@@ -10,7 +10,7 @@ class MessageManager:
     REQUESTS_TIMEOUT_SECONDS = app.config["REQUESTS_TIMEOUT_SECONDS"]
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_message(cls, message_id):
         response = requests.get(
             cls.MESSAGE_ENDPOINT + "/message/" + str(message_id),
@@ -19,7 +19,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_day_message(cls, year, month, day, user_id):
         """Get all the sent messages for a specific day"""
         response = requests.get(
@@ -37,7 +37,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_sent_messages_metadata(cls, user_id):
         response = requests.get(
             cls.MESSAGE_ENDPOINT + "/message/" + str(user_id) + "/sent/metadata",
@@ -46,7 +46,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_received_messages_metadata(cls, user_id):
         response = requests.get(
             cls.MESSAGE_ENDPOINT
@@ -58,7 +58,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_attachment(cls, msg_id):
         """
         This method contacts the message microservice
@@ -72,7 +72,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def send_message(cls, msg):
         """
         Send a message via the messages microservice
@@ -85,7 +85,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def delete_message_lottery_points(cls, message_id: int):
         """
         Contact the messaging microservice in order to sort out scheduled messages
@@ -99,7 +99,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def update_message(cls, message_id: int, attribute: str, value):
         response = requests.put(
             cls.MESSAGE_ENDPOINT + "/message",
@@ -109,7 +109,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_draft(cls, draft_id: int):
         response = requests.get(
             cls.MESSAGE_ENDPOINT + "/message/draft/" + str(draft_id),
@@ -118,7 +118,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_all_drafts_for_user(cls, user_id: int):
         response = requests.get(
             cls.MESSAGE_ENDPOINT + "/message/" + str(user_id) + "/draft",
@@ -128,7 +128,7 @@ class MessageManager:
 
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def send_notification(cls, sender: str, receiver: str):
         response = requests.put(
             cls.NOTIFICATIONS_ENDPOINT + "/email",
@@ -142,7 +142,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def save_new_draft(cls, draft):
         response = requests.post(
             cls.MESSAGE_ENDPOINT + "/message/draft",
@@ -152,7 +152,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def update_draft(cls, draft_id: int, draft):
         response = requests.put(
             cls.MESSAGE_ENDPOINT + "/message/draft/" + str(draft_id),
@@ -162,7 +162,7 @@ class MessageManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def delete_draft(cls, draft_id: int):
         response = requests.delete(
             cls.MESSAGE_ENDPOINT + "/message/draft/" + str(draft_id),

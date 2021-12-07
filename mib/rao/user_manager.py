@@ -11,7 +11,7 @@ class UserManager:
     REQUESTS_TIMEOUT_SECONDS = app.config["REQUESTS_TIMEOUT_SECONDS"]
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_user_by_id(cls, user_id: int) -> User:
         """
         This method contacts the users microservice
@@ -34,7 +34,7 @@ class UserManager:
             )
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def create_user(
         cls,
         email: str,
@@ -57,7 +57,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def update_user(cls, user_id: int, email: str, password: str):
         """
         This method contacts the users microservice
@@ -77,8 +77,8 @@ class UserManager:
         )
         return response
 
-    @circuit
     @classmethod
+    @circuit(expected_exception=requests.RequestException)
     def delete_user(cls, user_id: int):
         """
         This method contacts the users microservice
@@ -92,7 +92,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def authenticate_user(cls, email: str, password: str) -> User:
         """
         This method authenticates the user trough users AP
@@ -117,7 +117,7 @@ class UserManager:
             return user
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def change_password(cls, user_id: int, currpw: str, newpw: str, confpw: str):
         """Call users microservice to change the password for a user
         :param user_id: id of the user who wants to change the password
@@ -137,7 +137,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def set_content_filter(cls, id: int, filter: str):
         """Call users microservice to change the content filter for a user
 
@@ -153,7 +153,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def user_unregister(cls, user_id: int):
         """Call calls the users microservice in order to unsubscribe a user
 
@@ -166,7 +166,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_users_list_public(cls):
         response = requests.get(
             cls.USERS_ENDPOINT + "/user/list/public",
@@ -175,7 +175,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def report(cls, email: str):
         """Report the user with an email
 
@@ -189,7 +189,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def change_data_user(cls, user_id, email, firstname, lastname, dateofbirth):
         """Interacts with the microservice of the users in order to change the data of an
         already registered user
@@ -213,7 +213,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_blacklist(cls, user_id: int):
         """Get blacklisted users for user_id"""
         response = requests.get(
@@ -223,7 +223,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def add_to_blacklist(cls, user_id, userlist_to_add):
         """Add list of users to blacklist of user_id"""
         response = requests.put(
@@ -234,7 +234,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def remove_from_blacklist(cls, user_id, userlist_to_remove):
         """Remove list of users from blacklist of user_id"""
         response = requests.put(
@@ -254,7 +254,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_recipients(cls, user_id: int):
         response = requests.get(
             cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/recipients",
@@ -263,7 +263,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_user_public(cls, user_id: int):
         response = requests.get(
             cls.USERS_ENDPOINT + "/user/" + str(user_id) + "/public",
@@ -272,7 +272,7 @@ class UserManager:
         return response
 
     @classmethod
-    @circuit
+    @circuit(expected_exception=requests.RequestException)
     def get_user_by_id_json(cls, user_id: int):
         response = requests.get(
             cls.USERS_ENDPOINT + "/user/" + str(user_id),
