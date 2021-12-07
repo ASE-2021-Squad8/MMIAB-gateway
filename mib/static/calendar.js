@@ -1,5 +1,4 @@
 function get_day_message(day, month, year) {
-  console.log(month);
   var int_month = parseInt(month, 10) + 1;
   $.ajax({
     url: '/api/calendar/' + day + "/" + int_month + "/" + year,
@@ -11,12 +10,9 @@ function get_day_message(day, month, year) {
 }
 
 function write_message(data, day, month, year) {
-  console.log(data);
-
   // Set model up to read message
   var modal = document.getElementById("modal_read");
   var modal_text = document.getElementById("modal_read_text");
-  var btn = document.getElementById("myBtn");
   var span = document.getElementsByClassName("close")[0];
   modal.style.display = "block";
   modal_text.innerHTML = "";
