@@ -90,14 +90,6 @@ function buildTable(data) {
             dataType: 'json',
             success: function (response) { msg = response }
         })
-        user = ""
-        $.ajax({
-            url: '/api/user/' + msg.recipient + "/public",
-            type: 'GET',
-            async: false,
-            dataType: 'json',
-            success: function (response) { user = response },
-        })
 
         if (data[i].has_media) {
             msg.text += `<a class="btn btn-secondary" href="#" onclick="getAttachment(${data[i].id})">View attachment</a>`
@@ -106,6 +98,15 @@ function buildTable(data) {
         var row = `<tr>`
 
         if (msg.recipient) {
+            user = ""
+            $.ajax({
+                url: '/api/user/' + msg.recipient + "/public",
+                type: 'GET',
+                async: false,
+                dataType: 'json',
+                success: function (response) { user = response },
+            })
+            
             row += `<td>${user.firstname + " " + user.lastname}</td><td>${user.email}</td>`
         } else {
             row += `<td>None</td><td>None</td>`
