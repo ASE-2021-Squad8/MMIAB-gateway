@@ -4,10 +4,8 @@
 {% block content %}
 <h1>Content filter</h1>
 
-<a href="/" class="btn btn-outline-primary">Homepage</a>
 <a href="{{url_for('home.settings')}}" class="btn btn-outline-primary">Back to settings</a><br><br>
-
-Press enable to activate a content filter that automatically censors bad words!<br><br>
+Press enable to activate a content filter that automatically censors bad words!
 
 <form method="POST">
 	<input type="radio" id="enable_choice" name="filter" value="1">

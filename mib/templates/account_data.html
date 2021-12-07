@@ -3,7 +3,7 @@
 
 {% block content %}
 <h1>Account data</h1>
-
+<a href="{{url_for('home.settings')}}" class="btn btn-outline-primary">Back to settings</a>
 <div>
 	<br>
 	<h1>{{user.firstname}} {{user.lastname}}</h1>
