@@ -4,8 +4,7 @@ function timezoneString() {
     minutes = (Math.abs(offset) % 60).toString().padStart(2, "00")
     tz_string = offset < 0 ? `+${hours}:${minutes}` : `-${hours}:${minutes}`
 
-    dd = document.getElementById("timezone")
-    dd.value = tz_string
+    return tz_string
 }
 
 const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
@@ -153,7 +152,7 @@ function open_message_received(msg_id) {
         modal.style.display = "none";
     }
     window.onclick = function (event) {
-        if (event.target == modal) {
+        if (event.target === modal) {
             modal.style.display = "none";
         }
     }
@@ -200,7 +199,7 @@ function open_message_sent(msg_id) {
         modal.style.display = "none";
     }
     window.onclick = function (event) {
-        if (event.target == modal) {
+        if (event.target === modal) {
             modal.style.display = "none";
         }
     }
@@ -324,6 +323,8 @@ function send_msg_reply_forward(form_id, forwarding = false) {
     if (inputDate < now) {
         return alert("Date cannot be in the past")
     }
+
+    request_data.set("timezone", timezoneString());
 
     $.ajax({
         url: "/message",
