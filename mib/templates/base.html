@@ -9,6 +9,11 @@
 	<link href="{{url_for('static', filename='bootstrap.min.css')}}" rel="stylesheet">
 	<script src="{{url_for('static', filename='bootstrap.bundle.min.js')}}"></script>
 	<style>
+        nav {
+            background-color: #f8f8f8;
+            padding: .2rem 0 .5rem .5rem;
+            border-radius: .3rem;
+        }
 		.column-vertical-margins {
 			margin-top: 27px;
 			margin-bottom: 27px
@@ -62,7 +67,7 @@
 		<nav class="column-vertical-margins">
 			<ul class="menu">
 				<h1 id="name"><a href="/">MMIAB</a></h1>
-				<p>Made by Squad 8</p>
+				<p style="margin-top: -1.2rem;">Made by Squad 8</p>
 				{% if current_user.is_authenticated %}
 				<li><a href="{{url_for('users.search_user')}}">Search a user</a></li>
 				<li><a href="{{url_for('message.mailbox')}}">Mailbox</a></li>
