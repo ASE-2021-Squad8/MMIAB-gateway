@@ -1,3 +1,13 @@
+function timezoneString() {
+    offset = new Date().getTimezoneOffset()
+    hours = (Math.abs(offset) / 60).toString().padStart(2, "00")
+    minutes = (Math.abs(offset) % 60).toString().padStart(2, "00")
+    tz_string = offset < 0 ? `+${hours}:${minutes}` : `-${hours}:${minutes}`
+
+    dd = document.getElementById("timezone")
+    dd.value = tz_string
+}
+
 const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
     const byteCharacters = atob(b64Data);
     const byteArrays = [];

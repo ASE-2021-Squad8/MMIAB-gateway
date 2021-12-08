@@ -94,6 +94,7 @@
 			{{ ckeditor.create(name='reply_text') }}<br><br>
 			<label for="attachment">Attach an image</label><br>
 			<input id="attachment" name="attachment" type="file"><br><br>
+            <input id="timezone" name="timezone" type="text" hidden>
 			<label for="delivery_date">Choose a time for delivering message</label><br>
 			<input type="datetime-local" id="delivery_date" name="delivery_date" required /><br><br>
 			<button type="button" onclick='javascript:send_msg_reply_forward("reply-form" )'
@@ -115,6 +116,7 @@
 
 			{{ ckeditor.config(name='fwd_text') }}
 			{{ ckeditor.create(name='fwd_text') }}<br><br>
+            <input id="timezone" name="timezone" type="text" hidden>
 			<label for="delivery_date">Choose a time for delivering message</label><br>
 			<input type="datetime-local" id="delivery_date" name="delivery_date" required /><br><br>
 			<button type="button" onclick='javascript:send_msg_reply_forward("forward-form-rec" , true)'
@@ -125,9 +127,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-	var MEDIA_URL = `{{ url_for('static', filename='user_uploads/MEDIA') }}`
-</script>
 <script src="{{ url_for('static', filename='mailbox.js') }}"></script>
 <script>
 	function refreshTables() {

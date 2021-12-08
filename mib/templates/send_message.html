@@ -16,7 +16,7 @@
 	<dl>
 		<dt><label>Choose recipients </label></dt>
 		<p>(<i>Hint: use Ctrl or Cmd to select multiple users</i>)</p>
-		<dt><select multiple name="recipient" id="recipient"></dt></select><br><br>
+		<dt><select multiple name="recipient" id="recipient"></select></dt><br><br>
 		{% for field in form.display %}
 		<dt>{{ form[field].label }}</dt>
 		<dd>{{ form[field]() }}</dd><br>
