@@ -62,6 +62,8 @@ paths:
           description: Renders the account_data template, filled with the ssn form and the user's reservations
         302:
           description: Redirects to the homepage, in case the user accessing the profile is not its owner
+          
+  /user/edit_profile:
     post:
       summary: Updates the fields for the current user
       tags: [ User ]
@@ -97,6 +99,16 @@ paths:
           description: Renders the edit_profile template, to allow the customer to modify its data
         302:
           description: Redirects to the customer profile page
+    get:
+      summary: Render edit profile template
+      tags: [ User ]
+      description: Renders edit profile page
+      responses:
+        302:
+          description:  Profile edited, it redirects to the user profile page
+        500:
+          description: An error occured during updating user profile
+      
   
   /unregister:
     get:
@@ -106,6 +118,8 @@ paths:
       responses:
         302:
           description: User deleted, it redirects to the index page
+        500:
+          description: An error occured during deleting a user
   
   /logout:
     get:
@@ -121,7 +135,7 @@ paths:
       summary: Render sign up template
       responses:
         200:
-          description: Renders the login page
+          description: Renders the create user page
     post:
       summary: Add a new customer
       tags: [ User ]
@@ -153,21 +167,23 @@ paths:
       responses:
         302:
           description: Redirects to the login page
+        200:
+          description: Email user already exist, render create user page 
  
-  /user/blacklist:
+  /blacklist:
     get:
       summary: Render blacklist template
       tags: [ User]
       description: Return the user's black list page
-      operationId: handle_black_list_get
       responses:
         200:
           description: Black list retrieved, it returns the black list page
+        500:
+          description: An error occurred
     post:
       summary: Update the black list for a user
       tags: [User]
       description: Update user black list adding or removing an user
-      operationId: handle_black_list_post
       requestBody:
         required: true
         content:
@@ -221,30 +237,31 @@ paths:
                           type: string
                           format: email
                           example: mario.rossi@example.org
+        500:
+          description: An error occurred
+    
 
   /users:
     get:
       summary: Render users list template
       tags: [ User ]
-      operationId: _users
       responses:
         200:
           description: Render the users list
         default:
           description: An error occurred
   
-  /user/password:
+  /password:
     get:
       summary: Render change password template
       tags: [ User ]
-      operationId: change_pass_user_get
       responses:
         200:
           description: Return the page to change the password
+  
     post:
       summary: Change password for current user
       tags: [ User ]
-      operationId: change_pass_user_post
       requestBody:
         content:
           application/json:
@@ -270,19 +287,19 @@ paths:
       responses:
         200:
           description: Return the password page displaying the result of the operation
+        500:
+          description: An error occurred
   
-  /user/report:
+  /report:
     get:
       summary: Render report page
       tags: [ User ]
-      operationId: report_get
       responses:
         200:
           description: Return the page to report a user
     post:
       summary: Report a user
       tags: [ User ]
-      operationId: report_post
       requestBody:
         content:
           application/json:
@@ -298,18 +315,71 @@ paths:
       responses:
         200:
           description: Return the report page displaying the result of the operation
-  /user/content_filter:
+          
+  /api/user/recipient:
+    get:
+      summary: Get all the recipients for the current user
+      tags: [ User ]
+      responses:
+        200:
+          description: Return the list of recipients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 10
+                    email:
+                      type: string
+                      format: email
+                      example: mario.rossi@example.org
+                  
+        500:
+          description: An error occured
+          
+  /api/user/<id>/public:
+    get:
+      summary: Get user's public details
+      tags: [ User ]
+      responses:
+        200:
+          description: Return user's public details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User_Public"
+        500:
+          description: An error occured
+                
+                
+  /api/user/<id>:
+    get:
+      summary: Get user's by id
+      tags: [ User ]
+      responses:
+        200:
+          description: Return user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        500:
+          description: An error occured
+  
+          
+  /content_filter:
     get:
       summary: Render content filter page
       tags: [ User ]
-      operationId: content_filter_get
       responses:
         200:
           description: Return the page to report a user
     post:
         summary: Change the content filter state
         tags: [User]
-        operationId: content_filter_post
         requestBody:
           content:
             application/json:
@@ -325,40 +395,15 @@ paths:
         responses:
           200:
             description: Content filter state has been changed successfuly
-  /user/search_bar:
+          500:
+            description: An error occurred
+  /search_bar:
     get:
       summary: Render the search user page
       tags: [ User ]
-      operationId: search_bar_get
       responses:
         200:
           description: Return search user page
-  /user/list:
-    get:
-      summary: Return users list
-      tags: [ User ]
-      operationId: user_list_get
-      responses:
-        200: 
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  properties:
-                    email:
-                      type: string
-                      format: email
-                      example: rossi.mario@gmail.com
-                    firstname:
-                      type: string
-                      description: user's name
-                      example: Mario
-                    lastname:
-                      type: string
-                      description: user's last name
-                      example: Rossi
-          description: Return users list in json
   
   #Message
 
@@ -367,34 +412,67 @@ paths:
       summary: send message
       tags:
         - Message
-      operationId: message_post
       requestBody:
         description: Send a message
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Message'
+              type: object
+              
+              required:
+                - text
+                - sender
+                - recipient
+                - media
+                - delivery_date
+                - timezone
+                
+              properties:
+                text:
+                  type: string
+                  description: content of the message
+                  example: Hi Mate
+                sender:
+                  type: integer
+                  description: sender id
+                  example: 1
+                recipient:
+                  type: integer
+                  description: recipient id
+                  example: 2
+                media:
+                  type: string
+                  format: binary
+                  description: Attachment
+                delivery_date:
+                  type: string
+                  description: when the message will be sent
+                  example: '2021-11-21T16:15'
+                  format: date
+                timezone:
+                  type: string
+                  description: timezone
+                  example: '+01:00'
+                
+              
       responses:
         200:
           description: Sent
-        default:
+        500:
           description: Error during sending message
     get:
       tags: [Message]
       summary: Render message page
-      operationId: message_get
       responses:
         200:
           description: Return message page
-        default:
-          description: An error occured during the message satate updateing
+    
 
   /message/{message_id}:
     get:
       tags: [ Message ]
       summary: Get a message by id
-      operationId: get_message
       parameters:
         - name: message_id
           description: Message Unique ID
@@ -410,27 +488,41 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/Message'
-        404:
-          description: Message not found
-        default:
+        500:
           description: An error occured during retrieving the message
+          
+  /api/message/read_message/{message_id}:
+    get:
+      tags: [ Message ]
+      summary: Read the message with id and send a notification to the sender
+      parameters:
+        - name: message_id
+          description: Message Unique ID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Update message state and send notification
+        404: 
+          description: Message not found
+        500:
+          description: an error occurred
 
   /message/mailbox:
     get:
       tags: [ Message ]
       summary: Render mailboxpage
-      operationId: mailbox_get
       responses:
         200:
           description: Return mailbox page
-        default:
-          description: An error occured during rendering the mailbox page
   
-  /message/sent/metadata:
+  /sent/metadata:
     get:
       tags: [ Message ]
       summary: Get all sent messages metadata of an user
-      operationId: get_all_message_sent_metadata
       responses:
         200:
           description: Return messages
@@ -442,11 +534,10 @@ paths:
                     $ref: '#/components/schemas/MessageMetadata'
         default:
           description: An error occured during retrieving the metadata
-  /message/received/metadata:
+  /received/metadata:
     get:
       tags: [ Message ]
       summary: Get all received messages metadata of an user
-      operationId: get_all_message_received_metadata
       responses:
         200:
           description: Return messages
@@ -464,7 +555,6 @@ paths:
       tags:
         - Draft
       summary: Get all user's draft
-      operationId: get_drafts
       responses:
         200:
           description: Return messages
@@ -474,11 +564,12 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/MessageMetadata'
+        500:
+          description: An error occured
     post:
       tags:
         [Draft]
       summary: Save a draft
-      operationId: draft_post
       requestBody:
         description: Save draft state
         required: true
@@ -489,15 +580,17 @@ paths:
       responses:
         200:
           description: Draft updated
-        404:
-          description: Draft not found
+        400:
+          description: Empty message or extension not allowed
+        500:
+          description: An error occured
+        
     
-  /message/draft/{draft_id}:
+  /api/message/draft/{draft_id}:
     delete:
       tags:
         [Draft]
       summary: Delete a draft by id
-      operationId: delete_draft
       parameters:
         - name: draft_id
           description: Message Unique ID
@@ -509,17 +602,58 @@ paths:
       responses:
         200:
           description: Delete the draft
-        404:
-          description: Draft not found
-        default:
-          description: An error occured during retrieving the draft
+        500:
+          description: An error occured
+    get:
+      tags: [Draft]
+      parameters:
+        - name: draft_id
+          description: Message Unique ID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Return the draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Draft'
+        500:
+          description: An error occured
+  
+  /api/message/draft/{draft_id}/attachment:
+    delete:
+      tags:
+        [Draft]
+      summary: Delete draft's attachment 
+      parameters:
+        - name: draft_id
+          description: Message Unique ID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Return the draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Draft'
+        500:
+          description: An error occured
+   
+        
   
   /message/{message_id}/attachment:
     get:
       tags:
         [Message]
       summary: Retrieves an attachment of a message
-      operationId: attachment_get
       parameters:
         - name: message_id
           description: Message Unique ID
@@ -539,15 +673,14 @@ paths:
                     type: string
                     format: binary
           description: The attachment
-        404:
-          description: Message not found    
+        500:
+          description: An error occured    
     
-  /message/sent/{day}/{month}/{year}:
+  /api/calendar/{day}/{month}/{year}:
     get:
       tags:
         [Message]
       summary: Gets all messages sent in a time interval (includes yet to be delivered)
-      operationId: mib.resources.message.between_dates
       parameters:
         - name: day
           description: day
@@ -607,9 +740,7 @@ paths:
                     future:
                       type: boolean
                       example: true
-        404:
-          description: User id not found
-        default:
+        500:
           description: Something went wrong
   
   /lottery/{message_id}:
@@ -617,7 +748,6 @@ paths:
       tags:
         [Message]
       summary: Delete a message spending points
-      operationId: mib.resources.lottery.spend_points
       parameters:
         - name: message_id
           description: Message Unique ID
@@ -672,12 +802,11 @@ paths:
                     example: -1
                     format: int64
 
-  /message/bin/{message_id}:
+  /api/message/{message_id}:
     delete:
       tags:
         [Message]
       summary: Delete a received message 
-      operationId: delete_received_message
       parameters:
         - name: message_id
           description: Message Unique ID
@@ -689,14 +818,13 @@ paths:
       responses:
         200:
           description: Message deleted
-        404:
+        500:
           description: Message not found
-  /message/calendar:
+  /calendar:
     get:
       tags:
         [Message]
       summary: Render user's calendar
-      operationId: get_calendar
       responses:
        200:
         description: Return user's calendar
@@ -705,7 +833,6 @@ paths:
     get:
       summary: Render settings page
       tags: [Home]
-      operationId: get_settings
       responses:
         200:
           description: Return setting page
@@ -743,26 +870,7 @@ components:
           example: '2021-11-21T16:15'
           format: date
 
-    Draft:
-      type: object
-      properties:
-        text:
-          type: string
-          description: message body
-          example: 'Hi mate!'
-        sender:
-          type: integer
-          description: sender's id
-          example: 1
-        recipient:
-          type: integer
-          description: recipient's id
-          example: 2
-        media:
-          type: string
-          format: binary
-          description: Attachment
-
+    
           
     MessageMetadata:
       required:
@@ -783,3 +891,118 @@ components:
           type: boolean
           description: true if the message has an attachment
           example: true
+          
+    User_Public:
+      required:
+        - id
+        - firstname
+        - lastname
+        - email
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id of the user
+          example: 1
+        firstname:
+          type: string
+          description: First name of user
+          example: Mario
+        lastname:
+          type: string
+          description: Last name of user
+          example: Rossi
+        email:
+          type: string
+          description: User email
+          example: mario.rossi@example.org
+          format: email
+          
+    User:
+      required:
+        - id
+        - firstname
+        - lastname
+        - email
+        - dateofbirth
+        - password
+        - reports
+        - is_active
+        - points
+        - content_filter
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id of the user in the database
+          example: 1
+        firstname:
+          type: string
+          description: First name of user
+          example: Mario
+        lastname:
+          type: string
+          description: Last name of user
+          example: Rossi
+        email:
+          type: string
+          description: User email
+          example: mario.rossi@example.org
+          format: email
+        dateofbirth:
+          type: string
+          description: User dateofbirth
+          example: '2020-01-01'
+          format: datetime
+        password:
+          type: string
+          description: User password
+          example: 'abcd1234'
+          minLength: 1
+          maxLength: 127
+        reports:
+          type: integer
+          description: Number of reports received
+          example: 0
+        is_active:
+          type: boolean
+          description: If the user's account is active or not
+          example: true
+        points:
+          type: integer
+          description: Lottery points owned by a user
+          example: 0
+        content_filter:
+          type: boolean
+          description: Content filter activation
+          example: false
+          
+    Draft:
+      required:
+      - media
+      - recipient
+      - sender
+      - text
+      type: object
+      properties:
+        text:
+          type: string
+          description: message body
+          example: Hi mate!
+        sender:
+          type: integer
+          description: sender's id
+          example: 1
+        recipient:
+          type: integer
+          description: recipient's id
+          example: 2
+        media:
+          type: string
+          description: Attachment
+          format: binary
+      example:
+        sender: 1
+        recipient: 2
+        text: Hi mate!
+        media: ""

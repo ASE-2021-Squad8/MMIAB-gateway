@@ -291,8 +291,12 @@ def users_list():  # noqa: E501
     :rtype: None
     """
     response = UserManager.get_users_list_public()
-    users = response.json()
-    return render_template("users.html", users=users)
+
+    if response.status_code==200:
+        users = response.json()
+        return render_template("users.html", users=users)
+    else:
+        abort(500)
 
 
 @users.route("/api/user/recipients", methods=["GET"])
