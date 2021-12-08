@@ -1,0 +1,21 @@
+#
+# API Gateway configuration
+#
+
+# Flask settings
+FLASK_ENV=production
+APP_SECRET=2929383DmdosfSlsDKfkSl2304ssdfpgmfls302k
+
+# Redis conf
+REDIS_PORT=6379
+REDIS_DB=0
+
+# Set the service for each microservice
+USERS_MS_HOST=users_ms_worker
+MESSAGE_MS_HOST=message_ms_worker
+NOTIFICATIONS_MS_HOST=notifications_ms_worker
+
+# Set the ports for each microservice.
+USERS_MS_PORT=10001
+MESSAGE_MS_PORT=10002
+NOTIFICATIONS_MS_PORT=10003
