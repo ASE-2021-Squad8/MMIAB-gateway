@@ -83,7 +83,7 @@
 	<div class="modal-content">
 		<span class="close">&times;</span>
 		<h2>Reply to message</h2>
-		<form method="POST" id="reply-form" enctype="multipart/form-data">
+		<form method="POST" id="reply-form" enctype="multipart/form-data" onsubmit="javascript:timezoneString()">
 			<input type="hidden" id="draft_id" name="draft_id" value=''>
 			<label for="recipient">Recipient</label><br>
 			<select name="recipient">
@@ -108,7 +108,7 @@
 	<div class="modal-content">
 		<span class="close">&times;</span>
 		<h2>Forward message</h2>
-		<form method="POST" id="forward-form-rec">
+		<form method="POST" id="forward-form-rec" onsubmit="javascript:timezoneString()">
 			<input type="hidden" name="draft_id" value=''>
 			<label for="recipient">Recipient</label><br>
 			<select id="recipient" name="recipient"></select><br><br>

@@ -227,7 +227,7 @@ function reply_message(msg_email, recipient_id) {
 
     //Close modal
     window.onclick = function (event) {
-        if (event.target == modal_reply) {
+        if (event.target === modal_reply) {
             modal_reply.style.display = "none";
         }
     }
@@ -266,7 +266,7 @@ function forward_message(msg_email, msg_id, forwarding_sent = false) {
         modal_forward.style.display = "none";
     }
     window.onclick = function (event) {
-        if (event.target == modal_forward) {
+        if (event.target === modal_forward) {
             modal_forward.style.display = "none";
         }
     }
@@ -326,7 +326,7 @@ function send_msg_reply_forward(form_id, forwarding = false) {
     }
 
     $.ajax({
-        url: "/api/message",
+        url: "/message",
         data: request_data,
         contentType: false,
         processData: false,
