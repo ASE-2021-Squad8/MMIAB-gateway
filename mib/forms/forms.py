@@ -4,7 +4,7 @@ from flask_wtf.file import FileAllowed, FileField
 from flask_ckeditor import CKEditorField
 from wtforms.fields.simple import HiddenField
 from wtforms.validators import DataRequired
-from wtforms.fields.html5 import EmailField, DateField
+from wtforms.fields import EmailField, DateField
 
 class LoginForm(FlaskForm):
     email = f.StringField("email", validators=[DataRequired()])
